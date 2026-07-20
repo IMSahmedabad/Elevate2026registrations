@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elevate 2026 — Attendance Confirmation</title>
+<style>
+  :root{
+    --navy: #0B2545;
+    --navy-deep: #071A33;
+    --gold: #C9A227;
+    --gold-soft: #E7CE7A;
+    --cream: #F7F3EA;
+    --paper: #FFFFFF;
+    --ink: #1C2430;
+    --muted: #6B7280;
+    --line: #E3DCC8;
+    --error: #B3261E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--cream);
+    font-family: 'Source Sans Pro', 'Segoe UI', Arial, sans-serif;
+    color: var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding: 32px 16px 64px;
+  }
+  .wrap{ width:100%; max-width:560px; }
+
+  .masthead{
+    text-align:center;
+    margin-bottom:28px;
+  }
+  .logo-img{
+    height:56px;
+    width:auto;
+    margin-bottom:16px;
+  }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color: var(--gold);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:700;
+    font-size: 34px;
+    line-height:1.15;
+    margin:0 0 10px;
+    color: var(--navy-deep);
+  }
+  .sub{
+    color: var(--muted);
+    font-size:15px;
+    line-height:1.5;
+    max-width:440px;
+    margin:0 auto;
+  }
+
+  .dates{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-top:18px;
+  }
+  .datepill{
+    background: var(--navy);
+    color: var(--cream);
+    font-size:12.5px;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:999px;
+    letter-spacing:.02em;
+  }
+
+  .card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px 26px 26px;
+    box-shadow: 0 1px 2px rgba(11,37,69,0.04), 0 8px 24px rgba(11,37,69,0.05);
+  }
+
+  .steps{
+    display:flex;
+    align-items:center;
+    margin-bottom:26px;
+    gap:6px;
+  }
+  .step{
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .step-num{
+    width:24px; height:24px;
+    border-radius:50%;
+    border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700;
+    color: var(--muted);
+    background: var(--paper);
+    flex-shrink:0;
+    transition: all .2s ease;
+  }
+  .step-label{
+    font-size:12px;
+    color: var(--muted);
+    font-weight:600;
+    letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .step-line{
+    flex:1;
+    height:1.5px;
+    background: var(--line);
+    margin: 0 2px;
+  }
+  .step.done .step-num{ background: var(--navy); border-color: var(--navy); color: var(--cream); }
+  .step.done .step-label{ color: var(--navy); }
+  .step.active .step-num{ background: var(--gold); border-color: var(--gold); color: var(--navy-deep); }
+  .step.active .step-label{ color: var(--navy-deep); }
+
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    color: var(--navy-deep);
+    margin-bottom:8px;
+    letter-spacing:.01em;
+  }
+  .field{ margin-bottom:20px; }
+  select{
+    width:100%;
+    padding:13px 14px;
+    font-size:15.5px;
+    border:1.5px solid var(--line);
+    border-radius:9px;
+    background: var(--paper) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1l6 6 6-6" stroke="%236B7280" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 14px center;
+    appearance:none;
+    -webkit-appearance:none;
+    color: var(--ink);
+    cursor:pointer;
+    transition: border-color .15s ease;
+  }
+  select:disabled{ background-color:#F5F5F2; color:#AFAFAF; cursor:not-allowed; }
+  select:focus{ outline:none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,39,0.18); }
+  .hint{ font-size:12.5px; color: var(--muted); margin-top:6px; }
+
+  .confirm-block{
+    background: #FBF9F2;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding:18px 18px 16px;
+    margin-top: 6px;
+  }
+  .confirm-title{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size:17px;
+    color: var(--navy-deep);
+    margin: 0 0 10px;
+  }
+  .confirm-text{
+    font-size:14px;
+    line-height:1.55;
+    color: var(--ink);
+    margin: 0 0 14px;
+  }
+  .confirm-text b{ color: var(--navy-deep); }
+  .checkline{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    cursor:pointer;
+  }
+  .checkline input{
+    margin-top:3px;
+    width:18px; height:18px;
+    accent-color: var(--navy);
+    flex-shrink:0;
+    cursor:pointer;
+  }
+  .checkline span{ font-size:14px; line-height:1.5; }
+
+  .submit-btn{
+    width:100%;
+    margin-top:22px;
+    padding:15px;
+    background: var(--navy);
+    color: var(--cream);
+    border:none;
+    border-radius: 9px;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.01em;
+    cursor:pointer;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .submit-btn:hover:not(:disabled){ background: var(--navy-deep); }
+  .submit-btn:active:not(:disabled){ transform: scale(0.99); }
+  .submit-btn:disabled{ background:#C7CCD4; cursor:not-allowed; }
+
+  .footnote{
+    text-align:center;
+    font-size:12px;
+    color: var(--muted);
+    margin-top:18px;
+    line-height:1.5;
+  }
+
+  .success{
+    display:none;
+    text-align:center;
+    padding:20px 10px 6px;
+  }
+  .success.show{ display:block; }
+  .success .mark{
+    width:52px;height:52px;border-radius:50%;
+    background: var(--navy);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 16px;
+  }
+  .success h2{
+    font-family: Georgia, serif;
+    color: var(--navy-deep);
+    font-size:22px;
+    margin: 0 0 8px;
+  }
+  .success p{ color: var(--muted); font-size:14px; line-height:1.55; margin:0; }
+  .success .pin-echo{
+    display:inline-block;
+    margin-top:14px;
+    background: var(--cream);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 16px;
+    font-size:13px;
+    color: var(--navy-deep);
+    font-weight:700;
+  }
+
+  .error-msg{
+    display:none;
+    background:#FCECEA;
+    border:1px solid #F1C0BA;
+    color: var(--error);
+    font-size:13px;
+    padding:10px 14px;
+    border-radius:8px;
+    margin-top:14px;
+  }
+  .error-msg.show{ display:block; }
+
+  @media (max-width:420px){
+    h1{ font-size:28px; }
+    .card{ padding:22px 18px 20px; }
+    .step-label{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <img src="data:image/webp;base64,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" alt="IMS - Trusted for Success" class="logo-img">
+    <div class="eyebrow">IMS Ahmedabad · CAT 26</div>
+    <h1>Elevate 2026</h1>
+    <p class="sub">Confirm your attendance for the mock GD‑PI event so we can plan rooms, panels and timings around students who are certain to show up.</p>
+    <div class="dates">
+      <span class="datepill">24 Jul</span>
+      <span class="datepill">25 Jul</span>
+      <span class="datepill">26 Jul</span>
+    </div>
+  </div>
+
+  <div class="card" id="formCard">
+    <div class="steps" id="steps">
+      <div class="step active" data-step="1">
+        <div class="step-num">1</div><div class="step-label">Batch</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2">
+        <div class="step-num">2</div><div class="step-label">Name</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3">
+        <div class="step-num">3</div><div class="step-label">Confirm</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="batchSelect">Your batch</label>
+      <select id="batchSelect">
+        <option value="">Select your batch…</option>
+        <option value="CAT 2601">CAT 2601</option>
+        <option value="CAT 2602">CAT 2602</option>
+        <option value="CAT 2603">CAT 2603</option>
+        <option value="CAT 2604">CAT 2604</option>
+        <option value="CAT 2605">CAT 2605</option>
+        <option value="CAT 2606">CAT 2606</option>
+        <option value="CAT 2607">CAT 2607</option>
+        <option value="CAT 2608">CAT 2608</option>
+        <option value="CAT 2609">CAT 2609</option>
+        <option value="CAT 2610">CAT 2610</option>
+        <option value="CAT 2611">CAT 2611</option>
+        <option value="CAT 2612">CAT 2612</option>
+        <option value="CAT 2613">CAT 2613</option>
+        <option value="CAT 2614">CAT 2614</option>
+        <option value="CAT 2615">CAT 2615</option>
+        <option value="CAT 2616">CAT 2616</option>
+        <option value="CAT 2617">CAT 2617</option>
+        <option value="CAT 2618">CAT 2618</option>
+        <option value="CAT 2619">CAT 2619</option>
+        <option value="CAT 2620">CAT 2620</option>
+        <option value="CAT 2621">CAT 2621</option>
+        <option value="CAT 2622">CAT 2622</option>
+        <option value="CAT 2623">CAT 2623</option>
+        <option value="CAT 2624">CAT 2624</option>
+        <option value="CAT 2625">CAT 2625</option>
+        <option value="CAT 2626">CAT 2626</option>
+        <option value="CAT 2627">CAT 2627</option>
+        <option value="CAT 2628">CAT 2628</option>
+        <option value="CAT 2629">CAT 2629</option>
+        <option value="CAT 2630">CAT 2630</option>
+        <option value="CAT 2631">CAT 2631</option>
+        <option value="CAT 2632">CAT 2632</option>
+        <option value="CAT 2633">CAT 2633</option>
+        <option value="CAT 2634">CAT 2634</option>
+        <option value="CAT 2635">CAT 2635</option>
+        <option value="CAT 2636">CAT 2636</option>
+        <option value="CAT 2637">CAT 2637</option>
+        <option value="CAT 2638">CAT 2638</option>
+        <option value="CAT 2639">CAT 2639</option>
+        <option value="CAT 2640">CAT 2640</option>
+        <option value="CAT 2641">CAT 2641</option>
+        <option value="CAT 2642">CAT 2642</option>
+        <option value="CAT 2643">CAT 2643</option>
+        <option value="CAT 2644">CAT 2644</option>
+        <option value="CAT 2645">CAT 2645</option>
+        <option value="CAT 2646">CAT 2646</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="nameSelect">Your name</label>
+      <select id="nameSelect" disabled>
+        <option value="">Select your batch first…</option>
+      </select>
+      <div class="hint" id="nameHint"></div>
+    </div>
+
+    <div class="confirm-block" id="confirmBlock" style="display:none;">
+      <p class="confirm-title">Before you confirm</p>
+      <p class="confirm-text">
+        By checking below, you're confirming that <b id="confirmName">—</b>
+        (<span id="confirmBatch">—</span>) has <b>attempted SIMCAT 7</b>, and
+        will <b>attend Elevate 2026 in person on whichever day and slot
+        you're assigned</b> — 24, 25 or 26 July.
+      </p>
+      <label class="checkline">
+        <input type="checkbox" id="confirmCheck">
+        <span>I confirm the above and will attend, regardless of the slot I'm given.</span>
+      </label>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" disabled>Confirm my attendance</button>
+    <div class="error-msg" id="errorMsg">Something went wrong submitting your response. Please try again.</div>
+
+    <div class="success" id="successBlock">
+      <div class="mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6" stroke="#F7F3EA" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>You're confirmed for Elevate 2026</h2>
+      <p>Thanks — your slot (GD/PI, date and time) will be shared with you separately. See you there!</p>
+      <div class="pin-echo" id="pinEcho"></div>
+    </div>
+  </div>
+
+  <p class="footnote">One entry per student, please. If you selected the wrong batch or name, just refresh this page and start again.</p>
+</div>
+
+<script>
+// ---- Data: batch -> list of {name, pin} for active CAT 26 students ----
+const BATCH_DATA = {"CAT 2601": [{"name": "Aditya Gadhvi", "pin": "IMS0001103577"}, {"name": "Aniket Jadiya", "pin": "IMS0001141951"}, {"name": "Darshil Prajapati", "pin": "IMS0001016744"}, {"name": "Dev Shah", "pin": "IMS0001141820"}, {"name": "Devarsh Prajapati", "pin": "IMS0001142842"}, {"name": "Dhruvika Mehta", "pin": "IMS0001142753"}, {"name": "Dishant Prajapati", "pin": "IMS0001139960"}, {"name": "Ganesh Thosar", "pin": "IMS0001140237"}, {"name": "Jainish Chovatiya", "pin": "IMS0001141818"}, {"name": "Jaykumar Ladhava", "pin": "IMS0001138232"}, {"name": "Jaypal Sisodiya", "pin": "IMS0001108251"}, {"name": "Juhi Dave", "pin": "IMS0001143989"}, {"name": "Maharshi Patel", "pin": "IMS0001103789"}, {"name": "Maitri Kamdar", "pin": "IMS0001143757"}, {"name": "Manish Chaudhary", "pin": "IMS0001132532"}, {"name": "Neel Jain", "pin": "IMS0001130869"}, {"name": "palak Ratnani", "pin": "IMS0001138266"}, {"name": "Pankti Dave", "pin": "IMS0001064869"}, {"name": "Parthdeep Sinhjadeja", "pin": "IMS0001126553"}, {"name": "Rashmi Daswani", "pin": "IMS0001142748"}, {"name": "Renish Dolar", "pin": "IMS0001142843"}, {"name": "Rutuja Limbachiya", "pin": "IMS0001143974"}, {"name": "Saanjal Parikh", "pin": "IMS0001139289"}, {"name": "Shah Kavya", "pin": "IMS0001138380"}, {"name": "Shrusti Panchal", "pin": "IMS0001109208"}, {"name": "Tanvi Faldu", "pin": "IMS0001137079"}, {"name": "Tisha Gandhi", "pin": "IMS0001140061"}, {"name": "Utsav Chandrala", "pin": "IMS0001103327"}, {"name": "Vishwa Visodiya", "pin": "IMS0001103179"}, {"name": "Yashsinh Gohil", "pin": "IMS0001137972"}, {"name": "Yuti Acharya", "pin": "IMS0001142056"}], "CAT 2602": [{"name": "Achyllies Patel", "pin": "IMS0001149638"}, {"name": "Aditya Pandya", "pin": "IMS0001157857"}, {"name": "Akshat Ranka", "pin": "IMS0001159318"}, {"name": "Anirudh Jalan", "pin": "IMS0001162070"}, {"name": "Anushka Singh", "pin": "STU0001170823"}, {"name": "Archee Hindocha", "pin": "IMS0001084379"}, {"name": "Arya Vachhani", "pin": "IMS0001144451"}, {"name": "Aryan Amalsheda", "pin": "IMS0001109210"}, {"name": "Aryan Nema", "pin": "IMS0001160915"}, {"name": "Aumkar Mishal", "pin": "IMS0001157085"}, {"name": "Bhoomi Handoo", "pin": "STU0001170522"}, {"name": "Darshil Vora", "pin": "IMS0001146204"}, {"name": "Deep Shah", "pin": "IMS0001128095"}, {"name": "Dhairya Mehta", "pin": "IMS0001110276"}, {"name": "Dhruv Rajpurohit", "pin": "IMS0001160917"}, {"name": "Dhweep Ahuja", "pin": "IMS0000964337"}, {"name": "DIYA DANGARIA", "pin": "IMS0000812479"}, {"name": "Jay Rampariya", "pin": "IMS0001138599"}, {"name": "Karan Mittal", "pin": "IMS0001127416"}, {"name": "Mahek Shah", "pin": "STU0001166231"}, {"name": "Mahi Sanghavi", "pin": "IMS0001160187"}, {"name": "Meet Mukesh Pawar", "pin": "STU0001170440"}, {"name": "Nishtha Shah", "pin": "IMS0001146203"}, {"name": "Pavan Gandhi", "pin": "STU0001166230"}, {"name": "Preet Shah", "pin": "IMS0001040385"}, {"name": "Rushangi Shah", "pin": "IMS0001160792"}, {"name": "Teerth Nirmal Shrishrimal", "pin": "IMS0001147136"}, {"name": "Tirth Bhuva", "pin": "IMS0001162071"}, {"name": "Vedanshi Khandelwal", "pin": "IMS0001144571"}, {"name": "Vidhi Chotaliya", "pin": "IMS0000980202"}, {"name": "Yashika Navlakha", "pin": "STU0001166581"}], "CAT 2603": [{"name": "Aditya Raulji", "pin": "STU0001167611"}, {"name": "Ajit Kaswan", "pin": "IMS0001159888"}, {"name": "Alfina Tak", "pin": "IMS0001143243"}, {"name": "Ali Raza", "pin": "IMS0000979263"}, {"name": "Ansh Patoliya", "pin": "IMS0001156487"}, {"name": "Archit Viradiya", "pin": "STU0001166124"}, {"name": "Aryan Pipaliya", "pin": "IMS0001159959"}, {"name": "Denish Kakaniya", "pin": "IMS0001139471"}, {"name": "Devraj Shah", "pin": "IMS0001159685"}, {"name": "Dhruvil Suchak", "pin": "IMS0001008316"}, {"name": "Harsh Bodani", "pin": "STU0001166093"}, {"name": "Harsh Tadhani", "pin": "IMS0001163685"}, {"name": "Khushi Gajera", "pin": "STU0001168863"}, {"name": "Margeen Javia", "pin": "IMS0001095549"}, {"name": "Milan Sutariya", "pin": "STU0001166127"}, {"name": "Miral Sojitra", "pin": "STU0001168231"}, {"name": "Monil Gokani", "pin": "IMS0001142769"}, {"name": "Nikki Bhatia", "pin": "IMS0001158249"}, {"name": "Niyati Rathod", "pin": "IMS0001156200"}, {"name": "Prince Khunt", "pin": "IMS0001156489"}, {"name": "Smit Sabhaya", "pin": "STU0001166126"}, {"name": "Tanvi Vekariya", "pin": "STU0001168230"}, {"name": "Vansh Mehta", "pin": "IMS0001156723"}, {"name": "Vedanshi Chaniyara", "pin": "IMS0001143242"}], "CAT 2604": [{"name": "Aarya Shah", "pin": "IMS0001156319"}, {"name": "AERIK Patel", "pin": "IMS0001152690"}, {"name": "Annushri Shah", "pin": "IMS0001153920"}, {"name": "Aryan Ghinaiya", "pin": "IMS0001126836"}, {"name": "Daksh Bhansali", "pin": "IMS0001152273"}, {"name": "Dev Khatva", "pin": "IMS0001147753"}, {"name": "Dev Shah", "pin": "IMS0001147567"}, {"name": "Dev Tejani", "pin": "IMS0001156135"}, {"name": "Devanshi Vagashiya", "pin": "IMS0001145494"}, {"name": "Dhyan Patel", "pin": "IMS0001153919"}, {"name": "Drashti Parmar", "pin": "IMS0001150745"}, {"name": "Gopi Chodvadiya", "pin": "IMS0001145495"}, {"name": "Hetvi Doshi", "pin": "IMS0001143755"}, {"name": "Jayani Bhatt", "pin": "IMS0001154434"}, {"name": "Jethi Ahuja", "pin": "IMS0001152076"}, {"name": "Krish Patel", "pin": "IMS0001152688"}, {"name": "Krish Tejani", "pin": "IMS0001155192"}, {"name": "Krisha Vagasiya", "pin": "IMS0001147448"}, {"name": "Kritika Punjabi", "pin": "IMS0001148610"}, {"name": "Mayank Karangiya", "pin": "IMS0001146568"}, {"name": "Meet Shah", "pin": "IMS0001155001"}, {"name": "Nand Patel", "pin": "IMS0001151335"}, {"name": "Nihalpuri Goswami", "pin": "IMS0001140417"}, {"name": "Nishit Lukkad", "pin": "IMS0001151675"}, {"name": "Piyush Vanjani", "pin": "IMS0001144949"}, {"name": "Pradyumn Dadhania", "pin": "IMS0001144584"}, {"name": "Prem Dhanwani", "pin": "IMS0001144950"}, {"name": "Srashti Panwar", "pin": "IMS0001127131"}, {"name": "Tanisha Parmar", "pin": "IMS0001153362"}, {"name": "VATSAL JAIN", "pin": "IMS0001152275"}, {"name": "Vinit Godhani", "pin": "IMS0001147974"}], "CAT 2605": [{"name": "Aarya vichare", "pin": "STU0001170076"}, {"name": "Ami Mistry", "pin": "STU0001170260"}, {"name": "Ayush Karia", "pin": "IMS0001160238"}, {"name": "Bhadra Kalrawala", "pin": "STU0001169914"}, {"name": "Devendra Pareek", "pin": "IMS0001159799"}, {"name": "Harsh Gadhiya", "pin": "STU0001166379"}, {"name": "Het Shah", "pin": "IMS0001151593"}, {"name": "Jaimini Jaiswal", "pin": "STU1165178"}, {"name": "Jaymin Desai", "pin": "STU0001170053"}, {"name": "Jhanvi Mundhara", "pin": "IMS0001161345"}, {"name": "Keval Lad", "pin": "IMS0001009514"}, {"name": "KRISHA JOSHI", "pin": "STU0001167832"}, {"name": "Priyanka Suchak", "pin": "STU0001168538"}, {"name": "Rajvi Zinzuvadiya", "pin": "IMS0001151964"}, {"name": "Sagar Sardhara", "pin": "STU0001169389"}, {"name": "Sahil Bodani", "pin": "STU0001166091"}, {"name": "Saurav Upadhyay", "pin": "STU1165182"}, {"name": "Shruti Kotak", "pin": "STU0001166313"}, {"name": "Shruti Vamja", "pin": "STU0001165750"}, {"name": "Sreni Menon", "pin": "STU0001168537"}, {"name": "Subham Chauhan", "pin": "IMS0001154967"}, {"name": "Tanisha Bansal", "pin": "STU0001169909"}, {"name": "Tiksha Karnavat", "pin": "IMS0001159389"}, {"name": "Urvisha Zinzuvadiya", "pin": "IMS0001151966"}, {"name": "Viresh Acharya", "pin": "STU0001166666"}, {"name": "Visarg Shah", "pin": "STU0001166315"}, {"name": "Yash Kalwani", "pin": "STU0001167259"}], "CAT 2606": [{"name": "Bhumika Golani", "pin": "IMS0001163454"}, {"name": "Devraj Chaudhary", "pin": "STU0001174489"}, {"name": "Dhanwani Sagar", "pin": "STU0001179656"}, {"name": "Dhwanit Sengundhar", "pin": "STU0001169384"}, {"name": "Disha Padhiyar", "pin": "STU0001172692"}, {"name": "Hanumant Shrimali", "pin": "STU0001172630"}, {"name": "Harni Raninga", "pin": "STU0001184871"}, {"name": "Heer Chauhan", "pin": "STU0001187589"}, {"name": "Heet Shah", "pin": "IMS0001074406"}, {"name": "Hil Goyal", "pin": "STU0001183368"}, {"name": "Jayrajsinh Rathod", "pin": "IMS0001153154"}, {"name": "Jils Patel", "pin": "IMS0001091245"}, {"name": "Jinesh Gulgulia", "pin": "STU0001176295"}, {"name": "Khawaish Jain", "pin": "STU0001183243"}, {"name": "Krishi Mehta", "pin": "STU0001187265"}, {"name": "Krushi Sheth", "pin": "IMS0001147728"}, {"name": "Manthan Patni", "pin": "IMS0001061837"}, {"name": "Neha Baldaniya", "pin": "STU0001173751"}, {"name": "Palak Shah", "pin": "STU0001183812"}, {"name": "Prashant Vaghela", "pin": "IMS0001035983"}, {"name": "Rashmita Gattani", "pin": "STU0001188392"}, {"name": "Ritanshu Parmar", "pin": "STU0001181933"}, {"name": "Shyama Sukhadia", "pin": "IMS0001091571"}, {"name": "Tirth Patel", "pin": "STU0001185752"}, {"name": "Tushar Patel", "pin": "STU0001181179"}, {"name": "Yug Patel", "pin": "STU0001185755"}], "CAT 2607": [{"name": "Aaastha Matholiya", "pin": "STU0001191303"}, {"name": "Anshu Agarwal", "pin": "STU0001188032"}, {"name": "Bansi Chandarana", "pin": "STU0001193584"}, {"name": "Bhavesh Maud", "pin": "STU0001168162"}, {"name": "Bhavik Kathi", "pin": "STU0001196306"}, {"name": "Danish Chaudhary", "pin": "STU0001183706"}, {"name": "Devanshi Jain", "pin": "IMS0001160188"}, {"name": "Dhairya Himesh", "pin": "STU0001191563"}, {"name": "Heer Joshi", "pin": "IMS0001120688"}, {"name": "Himali Gupta", "pin": "STU0001193860"}, {"name": "Jaival Bhavsar", "pin": "STU0001174533"}, {"name": "Jaynil Mehta", "pin": "STU0001190840"}, {"name": "Jenish Agrawal", "pin": "IMS0001150881"}, {"name": "Mitwa Purohit", "pin": "STU0001185285"}, {"name": "Ritika Pamnani", "pin": "IMS0001150884"}, {"name": "Ritu Joshi", "pin": "STU0001194319"}, {"name": "Sajid Nurbhanej", "pin": "IMS0001153155"}, {"name": "Shailey Tanna", "pin": "STU0001180962"}, {"name": "Shaurya Panchal", "pin": "STU0001180958"}, {"name": "Shreya Prajapati", "pin": "STU0001176068"}, {"name": "Siya Jain", "pin": "STU0001191192"}, {"name": "Vandit shah", "pin": "STU0001185286"}, {"name": "Yashika Gudvani", "pin": "STU0001193478"}], "CAT 2608": [{"name": "Akash Amlani", "pin": "STU0001177617"}, {"name": "Chitransh Bohra", "pin": "STU0001203093"}, {"name": "Daksh Dhariwal", "pin": "STU0001198636"}, {"name": "Dev Pancholi", "pin": "STU0001194352"}, {"name": "Dev Verma", "pin": "STU0001202681"}, {"name": "Dhairya Agarwal", "pin": "STU0001199499"}, {"name": "Dhruv Vora", "pin": "STU0001179359"}, {"name": "Diya Phartiyal", "pin": "STU0001202700"}, {"name": "Harshil Patel", "pin": "STU0001201019"}, {"name": "Helish Patel", "pin": "STU0001197046"}, {"name": "Hiren Beriya", "pin": "STU0001200155"}, {"name": "Jimil Shah", "pin": "STU0001179362"}, {"name": "Kairavi Shah", "pin": "STU0001198127"}, {"name": "Kalrav Mistry", "pin": "STU0001202461"}, {"name": "Kush Maheshwari", "pin": "STU0001203444"}, {"name": "Mahi Thobhani", "pin": "STU0001191639"}, {"name": "Namrata Chawla", "pin": "STU0001198115"}, {"name": "Nandini Bhagchandani", "pin": "STU0001194490"}, {"name": "Nidhee Adesra", "pin": "STU0001195686"}, {"name": "Paavan Maheshwari", "pin": "STU0001202769"}, {"name": "Pratham Shah", "pin": "STU0001180122"}, {"name": "Rena Patel", "pin": "STU0001188441"}, {"name": "Rudra Patel", "pin": "STU0001192385"}, {"name": "Trisha Sheth", "pin": "STU0001167434"}, {"name": "Vatsal Bhatt", "pin": "STU0001180125"}], "CAT 2609": [{"name": "Aadi Shah", "pin": "STU0001193523"}, {"name": "Aditya Raval", "pin": "STU0001178525"}, {"name": "Akshita Samsukha", "pin": "STU0001199205"}, {"name": "Anmol Saijwani", "pin": "STU0001193219"}, {"name": "Ansh Mehta", "pin": "STU0001194812"}, {"name": "Anurag Pandey", "pin": "IMS0001153951"}, {"name": "Aum Dave", "pin": "IMS0001156335"}, {"name": "Aum Patil", "pin": "IMS0000982995"}, {"name": "Bhavya Dave", "pin": "IMS0001165022"}, {"name": "Dhairya Jadeja", "pin": "STU0001180960"}, {"name": "Dhyey Patel", "pin": "IMS0001086616"}, {"name": "Harsh Prajapati", "pin": "STU0001193215"}, {"name": "Jainam Shah", "pin": "STU0001171562"}, {"name": "Jainish Shah", "pin": "STU0001171563"}, {"name": "Jay Chauhan", "pin": "STU1165180"}, {"name": "Jay Chauhan", "pin": "STU1165180000"}, {"name": "Jenika Patel", "pin": "STU0001191792"}, {"name": "Jinay Golwala", "pin": "IMS0001104291"}, {"name": "Jitendra Prajapati", "pin": "STU0001192989"}, {"name": "Jiya Porwal", "pin": "IMS0001081732"}, {"name": "Khyat Dholakia", "pin": "STU0001188144"}, {"name": "Krushi Jain", "pin": "STU0001196887"}, {"name": "Mahi Khandelwal", "pin": "STU0001183544"}, {"name": "Nikita Kumari", "pin": "STU0001196975"}, {"name": "Nisha Chotara", "pin": "IMS0001139962"}, {"name": "Nitya Vora", "pin": "STU0001185425"}, {"name": "Parth Gondaliya", "pin": "STU0001196023"}, {"name": "Prajeeth P.L", "pin": "STU0001171935"}, {"name": "Prisha Fatania", "pin": "STU0001191789"}, {"name": "Priya Aswani", "pin": "STU0001193072"}, {"name": "Priyank Agrawal", "pin": "IMS0001087978"}, {"name": "Sahadev Paruparla", "pin": "STU0001193165"}, {"name": "SomKumar Swadeshi", "pin": "STU0001169647"}, {"name": "Suhani Maheshwari", "pin": "STU0001196972"}, {"name": "Upasana Dhomeja", "pin": "STU0001195751"}, {"name": "Vatsal Jani", "pin": "STU0001184648"}, {"name": "Vedika Kalani", "pin": "IMS0000980750"}, {"name": "Yash Prajapati", "pin": "STU0001193561"}], "CAT 2610": [{"name": "Ankush Pitliya", "pin": "IMS0001123161"}, {"name": "Darshit Adwani", "pin": "STU0001190663"}, {"name": "Dhruv Virani", "pin": "STU0001206114"}, {"name": "Goral Desai", "pin": "STU0001190064"}, {"name": "Harsh Sachdev", "pin": "STU0001207790"}, {"name": "Helly Ganatra", "pin": "STU0001210803"}, {"name": "Jinang Shah", "pin": "IMS0001086096"}, {"name": "Meet Shah", "pin": "STU0001194182"}, {"name": "Meetva Patel", "pin": "STU0001199312"}, {"name": "Neel Trivedi", "pin": "STU0001215794"}, {"name": "Om Patel", "pin": "STU0001206559"}, {"name": "Premal Patel", "pin": "STU0001192563"}, {"name": "Preyash Shah", "pin": "STU0001206258"}, {"name": "Rahi Patel", "pin": "STU0001201794"}, {"name": "Rushabh Shah", "pin": "STU0001210805"}, {"name": "Shish Shaikh", "pin": "STU0001210404"}, {"name": "Shubham More", "pin": "STU0001207471"}, {"name": "Tamanna Ramvani", "pin": "STU0001210067"}, {"name": "Tanish Bolia", "pin": "STU0001208089"}, {"name": "Vinay Goyal", "pin": "STU0001207336"}, {"name": "Yansi Patel", "pin": "STU0001191110"}], "CAT 2611": [{"name": "Aaditya Gajra", "pin": "STU0001203012"}, {"name": "Ananya Shreya", "pin": "IMS0000855080"}, {"name": "Avi Jain", "pin": "IMS0001087979"}, {"name": "Dhanvi Modi", "pin": "IMS0001110842"}, {"name": "Eva Saraf", "pin": "IMS0000926067"}, {"name": "Harmony Oza", "pin": "STU0001194123"}, {"name": "Hemakshi Goel", "pin": "STU0001203446"}, {"name": "Hetvi Patel", "pin": "STU0001203455"}, {"name": "Himanshi Kumar", "pin": "STU0001173059"}, {"name": "Jayesh Maheshwari", "pin": "STU0001203441"}, {"name": "Jeeya Dedakiya", "pin": "STU0001203020"}, {"name": "Jhanvi Gandhi", "pin": "IMS0000985340"}, {"name": "Kaivan Mehta", "pin": "IMS0000912869"}, {"name": "Krish Parekh", "pin": "IMS0000965358"}, {"name": "Krisha Dobariya", "pin": "STU0001169780"}, {"name": "Krishna Rathod", "pin": "STU0001189601"}, {"name": "Krutartha Nasit", "pin": "IMS0001078806"}, {"name": "Kush Baid", "pin": "IMS0001037281"}, {"name": "Kushagra Japra", "pin": "STU0001203559"}, {"name": "Maharshi Shinde", "pin": "IMS0001123062"}, {"name": "Miti Kotecha", "pin": "STU0001165759"}, {"name": "Neel Parmar", "pin": "STU0001186186"}, {"name": "Parth Guna", "pin": "STU0001203432"}, {"name": "Pragya Agnihotri", "pin": "STU0001203317"}, {"name": "Prisha Vipul Joshi", "pin": "IMS0001001418"}, {"name": "Rajvi Shah", "pin": "STU0001203301"}, {"name": "Riya Doshi", "pin": "IMS0001087651"}, {"name": "Sadhya Lakhani", "pin": "IMS0000933708"}, {"name": "Samiksha Chawla", "pin": "IMS0001089266"}, {"name": "Saumya", "pin": "STU0001203417"}, {"name": "Shafiya Ahmed", "pin": "STU0001189810"}, {"name": "Shreya Bhat", "pin": "STU0001203275"}, {"name": "Siddhi Goel", "pin": "IMS0001033123"}, {"name": "Swaroop Maheshwari", "pin": "IMS0001099404"}, {"name": "Vartika", "pin": "STU0001203243"}], "CAT 2612": [{"name": "Aditya Jani", "pin": "STU0001206310"}, {"name": "Aditya Mahajan", "pin": "IMS0001162433"}, {"name": "Divija Bhatt", "pin": "STU0001191007"}, {"name": "Harsh Kotkar", "pin": "STU0001214040"}, {"name": "Het Shah", "pin": "IMS0001123460"}, {"name": "Hom patel", "pin": "STU0001214865"}, {"name": "Karan Virani", "pin": "STU0001207590"}, {"name": "Megh Patel", "pin": "IMS0001159232"}, {"name": "Michael Vargheese", "pin": "STU0001195659"}, {"name": "Nishva Patel", "pin": "STU0001208073"}, {"name": "Prince Sanghvi", "pin": "STU0001214073"}, {"name": "Ritesh Paradiya", "pin": "STU0001204392"}, {"name": "Riya Dalwani", "pin": "STU0001193128"}, {"name": "Shreya Panchal", "pin": "STU0001188320"}, {"name": "Ved Patel", "pin": "STU0001202452"}, {"name": "Vidhi Kayasth", "pin": "STU0001211989"}], "CAT 2613": [{"name": "Aaska Dembla", "pin": "IMS0001138068"}, {"name": "Abhi Bhuva", "pin": "STU0001201268"}, {"name": "Adi Shah", "pin": "IMS0000930855"}, {"name": "Anushka Hiraskar", "pin": "STU0001201345"}, {"name": "Charvi Jain", "pin": "STU0001202815"}, {"name": "Danish Juneja", "pin": "STU0001187715"}, {"name": "Dhara Khachariya", "pin": "STU0001200818"}, {"name": "Dhara Thummar", "pin": "STU0001194689"}, {"name": "Dhruv Dhabaliya", "pin": "IMS0001068898"}, {"name": "Dhruvi Soni", "pin": "STU0001203017"}, {"name": "Harshil Vasoya", "pin": "STU0001199237"}, {"name": "Harshit Baldi", "pin": "STU0001201809"}, {"name": "Hemanshu Rachchh", "pin": "STU0001204837"}, {"name": "Het Changani", "pin": "STU0001201270"}, {"name": "Himanshi Agarwal", "pin": "IMS0000992560"}, {"name": "Hiya Singal", "pin": "STU0001208299"}, {"name": "Ishana Meghrajani", "pin": "STU0001198119"}, {"name": "Jainin Kharariya", "pin": "STU0001205838"}, {"name": "Jaydev Naghera", "pin": "STU0001201089"}, {"name": "Khushi Patel", "pin": "STU0001202354"}, {"name": "Kushan Kalwani", "pin": "STU0001201103"}, {"name": "Meet Bhikadiya", "pin": "STU0001200551"}, {"name": "Moneet Punwani", "pin": "STU0001203398"}, {"name": "Nirbhay Raval", "pin": "STU0001201914"}, {"name": "Parth Shah", "pin": "STU0001199530"}, {"name": "Priyanshi Apani", "pin": "STU0001204728"}, {"name": "Ravi Kathiriya", "pin": "STU0001199236"}, {"name": "Rency Makwana", "pin": "STU0001193020"}, {"name": "Sakshi Patawari", "pin": "STU0001199887"}, {"name": "Shreya Roy", "pin": "STU0001202082"}, {"name": "Unnati Sethiya", "pin": "STU0001188816"}, {"name": "Vanshika Patel", "pin": "STU0001203000"}, {"name": "Vedansh Vyas", "pin": "IMS0001158684"}], "CAT 2614": [{"name": "Animesh Jain", "pin": "IMS0001159797"}, {"name": "Avika Shah", "pin": "STU0001171248"}, {"name": "Bhaliya Vijay", "pin": "STU0001201351"}, {"name": "Bhoomi Jivnani", "pin": "STU0001209203"}, {"name": "Daksh Mevawala", "pin": "STU0001202317"}, {"name": "Dhrumi Solanki", "pin": "IMS0001102541"}, {"name": "Dhrumil Davra", "pin": "STU0001207549"}, {"name": "Dhruv Chauhan", "pin": "STU0001205521"}, {"name": "Dipika Kanjani", "pin": "STU0001209172"}, {"name": "Diya Panchal", "pin": "STU0001206989"}, {"name": "Freya Shah", "pin": "STU0001186746"}, {"name": "Harsh Arvadia", "pin": "STU0001193205"}, {"name": "Hemant Jain", "pin": "STU0001202378"}, {"name": "Het Raval", "pin": "STU0001202870"}, {"name": "Himanshu Chhajed", "pin": "STU0001199955"}, {"name": "Jeel Atara", "pin": "STU0001186387"}, {"name": "Keyur Dave", "pin": "STU0001204799"}, {"name": "Krish Patel", "pin": "STU0001206493"}, {"name": "Kritik Tiwari", "pin": "STU0001202254"}, {"name": "Maharshi Shukla", "pin": "IMS0001041446"}, {"name": "Mayank Rathod", "pin": "STU0001166535"}, {"name": "Mokshil Bhansari", "pin": "STU0001181035"}, {"name": "Parshva Shah", "pin": "STU0001205018"}, {"name": "Prince Kakadiya", "pin": "IMS0001119466"}, {"name": "Raghav Nyati", "pin": "STU0001206626"}, {"name": "Raj Sabhaya", "pin": "STU0001174937"}, {"name": "Riya Makwana", "pin": "STU0001207207"}, {"name": "Saumya Patel", "pin": "STU0001207515"}, {"name": "Smit Bhagat", "pin": "STU0001166536"}, {"name": "Tanisha Shah", "pin": "STU0001199800"}, {"name": "Tirth Sheth", "pin": "STU0001202345"}, {"name": "Vani Khant", "pin": "STU0001206103"}, {"name": "Vanshika Sharma", "pin": "IMS0001156235"}, {"name": "Vishesh Rajwani", "pin": "IMS0001120766"}, {"name": "Vishva Lakhani", "pin": "IMS0001102490"}], "CAT 2615": [{"name": "Abel Biju", "pin": "STU0001210318"}, {"name": "Akshee Dave", "pin": "IMS0001115549"}, {"name": "Anukruti Lodha", "pin": "STU0001206235"}, {"name": "Bhavyaa Lad", "pin": "STU0001190996"}, {"name": "Dhruvi Pala", "pin": "STU0001197762"}, {"name": "Heli Vora", "pin": "IMS0001087271"}, {"name": "Hetvi Raval", "pin": "STU0001196612"}, {"name": "Hit Ghodasara", "pin": "STU0001203766"}, {"name": "Hith Shah", "pin": "STU0001210442"}, {"name": "Ishan Yadav", "pin": "STU0001210790"}, {"name": "Ishita Patel", "pin": "STU0001208937"}, {"name": "Ishva Tanna", "pin": "STU0001190647"}, {"name": "Jamila Lokhandwala", "pin": "STU0001192013"}, {"name": "Jash Nayak", "pin": "STU0001172546"}, {"name": "Kashish Taksali", "pin": "STU0001206110"}, {"name": "Kavyam Gupta", "pin": "STU0001206716"}, {"name": "Keshav Garg", "pin": "STU0001207062"}, {"name": "Kruti Popat", "pin": "IMS0001137270"}, {"name": "Nikki Purswani", "pin": "STU0001189951"}, {"name": "Panth Shah", "pin": "STU0001205883"}, {"name": "Parth Belwal", "pin": "STU0001210792"}, {"name": "Parth Makadiya", "pin": "STU0001208271"}, {"name": "Pritha Shah", "pin": "STU0001205147"}, {"name": "Priyanshi Patel", "pin": "IMS0001113604"}, {"name": "Pujan Patel", "pin": "STU0001209752"}, {"name": "Rudri Dave", "pin": "STU0001207831"}, {"name": "Suifiyan JamalKhan", "pin": "STU0001212339"}, {"name": "Zenish Panchal", "pin": "STU0001194782"}], "CAT 2616": [{"name": "Aanchal Lalwani", "pin": "STU0001209868"}, {"name": "Aashvi Shah", "pin": "STU0001219043"}, {"name": "Aayush Bhatt", "pin": "IMS0001126164"}, {"name": "Akshat Shah", "pin": "STU0001210545"}, {"name": "Arham Salot", "pin": "STU0001204419"}, {"name": "Devna Rathod", "pin": "IMS0001140963"}, {"name": "Dhyani Dave", "pin": "STU0001218696"}, {"name": "Divesha Divetia", "pin": "STU0001192290"}, {"name": "Dular Sarodia", "pin": "STU0001207603"}, {"name": "Helly Govani", "pin": "STU0001201483"}, {"name": "Het Shah", "pin": "STU0001189348"}, {"name": "Himani Parikh", "pin": "STU0001189451"}, {"name": "Hitarth Unjia", "pin": "STU0001210081"}, {"name": "Hiya Asrani", "pin": "STU0001212282"}, {"name": "Ishit Dave", "pin": "IMS0001162414"}, {"name": "James Patel", "pin": "STU0001212725"}, {"name": "Karen Chhaya", "pin": "STU0001210655"}, {"name": "Keshvi Dhamecha", "pin": "STU0001222896"}, {"name": "Khanak Modi", "pin": "STU0001225062"}, {"name": "Khushi Padaliya", "pin": "STU0001211788"}, {"name": "Kirtan Tandel", "pin": "STU0001203546"}, {"name": "Krish Mehta", "pin": "STU0001210855"}, {"name": "Krish Patel A", "pin": "STU0001207029"}, {"name": "Krish Patel M", "pin": "STU0001191497"}, {"name": "Mahek Shah", "pin": "STU0001176615"}, {"name": "Manan Panchal", "pin": "STU0001168806"}, {"name": "Masum", "pin": "STU0001209332"}, {"name": "Meet Dholariya", "pin": "STU0001206123"}, {"name": "Misty Thummar", "pin": "STU0001199086"}, {"name": "Nikunj Parmar", "pin": "STU0001203335"}, {"name": "Nishi Shah", "pin": "STU0001213292"}, {"name": "Palak Sharma", "pin": "STU0001201485"}, {"name": "Pranali Goyal", "pin": "IMS0000982179"}, {"name": "Prem Bachani", "pin": "STU0001203353"}, {"name": "Priyal Naik", "pin": "IMS0001128098"}, {"name": "Pushya Shah", "pin": "STU0001216670"}, {"name": "Raunak Kumar", "pin": "IMS0000982761"}, {"name": "Riya Sachdev", "pin": "STU0001218119"}, {"name": "Rudra Pandya", "pin": "STU0001201441"}, {"name": "Stuti Savaliya", "pin": "STU0001189350"}, {"name": "Suhani Gandhi", "pin": "STU0001203515"}, {"name": "Suhasini Lodha", "pin": "STU0001204099"}, {"name": "Tanisha Garg", "pin": "IMS0001090574"}, {"name": "Tisha Shah", "pin": "STU0001209643"}, {"name": "Tithi Shah", "pin": "STU0001187524"}, {"name": "Trisha Upadhyay", "pin": "IMS0001128097"}, {"name": "Vanshika Shah", "pin": "STU0001206829"}, {"name": "Vanya Kabra", "pin": "STU0001226593"}, {"name": "Vidhi Shah", "pin": "IMS0001090572"}, {"name": "Vishvam Patel", "pin": "STU0001212338"}, {"name": "Yashika Rajgarhia", "pin": "IMS0001088145"}], "CAT 2617": [{"name": "Aanjneya Joshi", "pin": "IMS0000888261"}, {"name": "Aaryan Gupta", "pin": "STU0001212253"}, {"name": "Aayush Sharma", "pin": "STU0001218459"}, {"name": "Aditya Aswani", "pin": "STU0001176678"}, {"name": "Arshiya Bajaj", "pin": "STU0001222015"}, {"name": "Ashana Shah", "pin": "STU0001223853"}, {"name": "Deepanshu Singh", "pin": "STU0001212255"}, {"name": "Gaurika Dixit", "pin": "IMS0001162269"}, {"name": "Het Dalal", "pin": "IMS0000960768"}, {"name": "Kritika Gupta", "pin": "STU0001210197"}, {"name": "Manya Tripathi", "pin": "STU0001169918"}, {"name": "Nehal Jain", "pin": "STU0001203541"}, {"name": "Nikunj Jhawar", "pin": "IMS0001014163"}, {"name": "Puneet Agrawal", "pin": "STU0001212254"}, {"name": "Shreya Raj", "pin": "STU0001186033"}, {"name": "Sneha Harjai", "pin": "STU0001211768"}], "CAT 2618": [{"name": "devansh dawda", "pin": "STU0001229353"}, {"name": "Dhruvil Somani", "pin": "IMS0000949768"}, {"name": "Gargi Sharma", "pin": "STU0001232632"}, {"name": "Harmish Patel", "pin": "STU0001227402"}, {"name": "Jagdish Luharr", "pin": "STU0001230323"}, {"name": "Jayvat Shah", "pin": "STU0001235868"}, {"name": "Kavya Dholariya", "pin": "STU0001230221"}, {"name": "Khushi Sharma", "pin": "STU0001225211"}, {"name": "Krish Modi", "pin": "STU0001234258"}, {"name": "Krithik Chandraan", "pin": "STU0001185445"}, {"name": "Mitsu Ramanuj", "pin": "STU0001230939"}, {"name": "Nisrag Patel", "pin": "STU0001186670"}, {"name": "Parekh Rushabh", "pin": "STU0001232531"}, {"name": "Prachiti Joshi", "pin": "STU0001235700"}, {"name": "Rudra Mehta", "pin": "STU0001196360"}, {"name": "Sanya Harwani", "pin": "STU0001225212"}, {"name": "Suchita Gaddam", "pin": "STU0001199973"}, {"name": "Tirth shah", "pin": "STU0001230755"}, {"name": "Vansh Dhariya", "pin": "IMS0000992610"}, {"name": "Vanshika Manwani", "pin": "STU0001231204"}, {"name": "yash ludhani", "pin": "STU0001232107"}], "CAT 2619": [{"name": "Apeksha Mundra", "pin": "STU0001209410"}, {"name": "Gargi Jain", "pin": "STU0001221983"}, {"name": "Jocelyn Best", "pin": "STU0001202430"}, {"name": "Keshav Bajaj", "pin": "STU0001215103"}, {"name": "Krish Mehta", "pin": "STU0001221314"}, {"name": "Maitri Patel", "pin": "STU0001200586"}, {"name": "Nandini Nagar", "pin": "IMS0001078290"}, {"name": "Netra Agrawal", "pin": "STU0001221560"}, {"name": "Nisarg Ganatra", "pin": "IMS0001095662"}, {"name": "Parth Dama", "pin": "IMS0001161221"}, {"name": "Prince Pandya", "pin": "STU0001217851"}, {"name": "Priyal Gadhiya", "pin": "STU0001217742"}, {"name": "Soumya Panchal", "pin": "STU0001168693"}, {"name": "Yashvi Patel", "pin": "STU0001214141"}, {"name": "Yuvika Bajaj", "pin": "STU0001217200"}], "CAT 2620": [{"name": "Aryan Sharma", "pin": "STU0001217871"}, {"name": "Ayan Bera", "pin": "IMS0001162814"}, {"name": "Dayesh Shah", "pin": "STU0001212407"}, {"name": "Devanshi Sharma", "pin": "STU0001214841"}, {"name": "Dhanashree Mudaliar", "pin": "IMS0001162813"}, {"name": "Dhir Gavande", "pin": "STU0001216287"}, {"name": "Dhruvil Panchal", "pin": "STU0001210128"}, {"name": "Eva Prajapati", "pin": "STU0001221323"}, {"name": "Gourav Bansal", "pin": "STU0001196962"}, {"name": "Himani Ghiya", "pin": "STU0001212364"}, {"name": "Himanshi Najwani", "pin": "STU0001217116"}, {"name": "Hinsu Rensh", "pin": "IMS0001153664"}, {"name": "Jafarabbas Momin", "pin": "STU0001211344"}, {"name": "Jahnvi Modi", "pin": "STU0001214247"}, {"name": "Kathan Prajapati", "pin": "STU0001221315"}, {"name": "Kavya Singh Chauhan", "pin": "STU0001219385"}, {"name": "Krish Sharma", "pin": "STU0001206964"}, {"name": "Kunal Najwani", "pin": "STU0001217117"}, {"name": "NavpritKaur Bamrah", "pin": "STU0001206529"}, {"name": "Nihar Soni", "pin": "STU0001211689"}, {"name": "Nitya Bhansali", "pin": "STU0001217215"}, {"name": "Param Thakkar", "pin": "STU0001199335"}, {"name": "Pratik Panchal", "pin": "STU0001212415"}, {"name": "Shreyash Thummar", "pin": "STU0001199238"}, {"name": "Shubham Prajapati", "pin": "STU0001216253"}, {"name": "Smitangi Acharya", "pin": "IMS0001024556"}, {"name": "Soumya Jain", "pin": "STU0001178385"}, {"name": "Vishwa Pandya", "pin": "STU0001213295"}], "CAT 2621": [{"name": "Aanchal Agrawal", "pin": "STU0001225670"}, {"name": "Aashvi Falgunia", "pin": "STU0001210712"}, {"name": "Bhavpreet Kaur", "pin": "STU0001223704"}, {"name": "Deep Sangani", "pin": "STU0001222091"}, {"name": "Hansal Chauhan", "pin": "STU0001219912"}, {"name": "Harsha Ghanwani", "pin": "STU0001223257"}, {"name": "Hitarth Pandya", "pin": "STU0001229326"}, {"name": "hiten vasyani", "pin": "STU0001223427"}, {"name": "Jival John", "pin": "STU0001222035"}, {"name": "Khush Patadia", "pin": "STU0001183592"}, {"name": "Kunjal Kalariya", "pin": "STU0001227693"}, {"name": "Lakshita Chaudhary", "pin": "STU0001199651"}, {"name": "Mahek Sharma", "pin": "STU0001206653"}, {"name": "Manan Hirpara", "pin": "STU0001219882"}, {"name": "Namya Nayak", "pin": "STU0001224047"}, {"name": "Neel Talreja", "pin": "STU0001206636"}, {"name": "Priyal Shah", "pin": "STU0001172299"}, {"name": "Sahil Talreja", "pin": "STU0001206638"}, {"name": "Shubham Shah", "pin": "STU0001171178"}, {"name": "Swayam Talreja", "pin": "STU0001206635"}, {"name": "Virendra Bhati", "pin": "STU0001184294"}, {"name": "Vishva Vaishnav", "pin": "STU0001226703"}, {"name": "Vishwa Patel", "pin": "STU0001226702"}, {"name": "Yesha Karia", "pin": "STU0001223628"}], "CAT 2622": [{"name": "Aditi Jalan", "pin": "STU0001227460"}, {"name": "Armaan Puthawala", "pin": "STU0001212857"}, {"name": "Bhavya Vasavada", "pin": "IMS0001139376"}, {"name": "Chintan Radadiya", "pin": "IMS0001150653"}, {"name": "Devangsh Singh", "pin": "STU0001218617"}, {"name": "Dimpy Vachhrajani", "pin": "STU0001208307"}, {"name": "Hemant Mehta", "pin": "IMS0000876353"}, {"name": "Janvi Dolani", "pin": "STU0001207308"}, {"name": "Kaushal Mistry", "pin": "IMS0000992047"}, {"name": "Manasvi Aushwaha", "pin": "STU0001226342"}, {"name": "Maurvi Ravat", "pin": "STU0001220604"}, {"name": "Neel Kadchha", "pin": "STU0001231157"}, {"name": "Nishith Patel", "pin": "IMS0000884914"}, {"name": "PARVA DALAL", "pin": "IMS0001011507"}, {"name": "Prasham Gundecha", "pin": "STU0001218370"}, {"name": "Prit Boricha", "pin": "STU0001220948"}, {"name": "Pushti Soni", "pin": "STU0001232387"}, {"name": "Rajveer Zala", "pin": "STU0001206408"}, {"name": "Rena Malhotra", "pin": "STU0001227697"}, {"name": "Rishabh Goyal", "pin": "STU0001226673"}, {"name": "Rishi Joshi", "pin": "STU0001224893"}, {"name": "Rushil Acharya", "pin": "STU0001228737"}, {"name": "Sanskar Gaur", "pin": "STU0001228907"}, {"name": "Setu Parmar", "pin": "IMS0001119920"}, {"name": "Shaily Suthar", "pin": "STU0001221343"}, {"name": "Sheran Sharma", "pin": "IMS0000993428"}, {"name": "Shivam Soni", "pin": "IMS0001154176"}, {"name": "Siddharth Maru", "pin": "STU0001218941"}, {"name": "Tatva Shah", "pin": "IMS0001083980"}, {"name": "Tirth Sheth", "pin": "STU0001230167"}, {"name": "Vidisha Bindal", "pin": "STU0001227845"}, {"name": "Yug Prajapati", "pin": "STU0001224613"}], "CAT 2623": [{"name": "Aishwarya Jain", "pin": "IMS0001139974"}, {"name": "Aishwarya Singh", "pin": "IMS0001159721"}, {"name": "Aman karar", "pin": "STU0001232824"}, {"name": "Arushi Ramani", "pin": "STU0001234580"}, {"name": "Darshi Parekh", "pin": "STU0001225337"}, {"name": "Dhara Rana", "pin": "STU0001231743"}, {"name": "Dhruv Adalja", "pin": "STU0001172298"}, {"name": "Dhyey Patel", "pin": "STU0001232746"}, {"name": "Dimpal Shah", "pin": "STU0001219618"}, {"name": "Drisha Patel", "pin": "STU0001229992"}, {"name": "Hardik Patni", "pin": "STU0001232238"}, {"name": "Harsh Vasani", "pin": "IMS0001108270"}, {"name": "Hitesh Prajapati", "pin": "STU0001166717"}, {"name": "Jiya Maniar", "pin": "STU0001193197"}, {"name": "Keshav Pareek", "pin": "IMS0001164007"}, {"name": "Laksh Pamecha", "pin": "STU0001231603"}, {"name": "Mahi Patel", "pin": "STU0001229661"}, {"name": "Manshavi Kothari", "pin": "STU0001211245"}, {"name": "Meet Gaudani", "pin": "STU0001230034"}, {"name": "Muzib Panchbhaiya", "pin": "STU0001211082"}, {"name": "Nidhi Sharma", "pin": "STU0001231342"}, {"name": "Nitin Yadav", "pin": "STU0001233830"}, {"name": "Pranjal Prajapat", "pin": "STU0001232472"}, {"name": "Pratham Dawda", "pin": "IMS0001126012"}, {"name": "Prince Parmar", "pin": "STU0001230576"}, {"name": "Priyanshi Tailor", "pin": "STU0001211029"}, {"name": "Shaily Shah", "pin": "STU0001211247"}, {"name": "Soham Adeshra", "pin": "STU0001231930"}, {"name": "Suhani Patel", "pin": "STU0001230577"}, {"name": "Trisha Panchal", "pin": "STU0001234725"}, {"name": "Vaishnavi Patel", "pin": "STU0001221266"}, {"name": "Varun Khatri", "pin": "STU0001228470"}, {"name": "Vedansh Dadlani", "pin": "STU0001203168"}, {"name": "Vedanshi shah", "pin": "STU0001229694"}, {"name": "Viraj Vasava", "pin": "STU0001219671"}], "CAT 2624": [{"name": "Abhishek Singhania", "pin": "STU0001233970"}, {"name": "Anshika Krishnani", "pin": "STU0001236024"}, {"name": "Aryan dubey", "pin": "STU0001234990"}, {"name": "Avani Makwe", "pin": "STU0001234506"}, {"name": "Bansari Joshi", "pin": "STU0001177609"}, {"name": "Birva Prajapati", "pin": "STU0001236020"}, {"name": "Chirag Rajpurohit", "pin": "STU0001230641"}, {"name": "Denim Kumar", "pin": "IMS0001027668"}, {"name": "Devansh Patel", "pin": "IMS0001159956"}, {"name": "Dhruva Suthar", "pin": "STU0001232902"}, {"name": "Dhwani Soni", "pin": "STU0001222788"}, {"name": "Heer Nimavat", "pin": "STU0001223398"}, {"name": "Ishan Chaturvedi", "pin": "STU0001233919"}, {"name": "Jash Palod", "pin": "STU0001236012"}, {"name": "Karmdeep Sarvaiya", "pin": "STU0001232050"}, {"name": "Khushi Upadhyay", "pin": "STU0001235592"}, {"name": "Meet Bhanushali", "pin": "STU0001235326"}, {"name": "Nancy Patel", "pin": "STU0001234704"}, {"name": "Neel Jain", "pin": "STU0001211608"}, {"name": "Nikki Gohel", "pin": "STU0001236022"}, {"name": "Palak Rathod", "pin": "STU0001237163"}, {"name": "Parth Dave", "pin": "STU0001232901"}, {"name": "Payal Choudhary", "pin": "STU0001237130"}, {"name": "Pearl Shah", "pin": "STU0001227078"}, {"name": "Prachi Maheshwari", "pin": "STU0001233850"}, {"name": "Pranshu Shah", "pin": "STU0001235165"}, {"name": "Priyanshu Jain", "pin": "IMS0001153891"}, {"name": "Ruchir Patel", "pin": "STU0001235942"}, {"name": "Ruchita Chauhan", "pin": "STU0001237377"}, {"name": "Rushi Thakkar", "pin": "IMS0001159378"}, {"name": "Saumya Patel", "pin": "STU0001232900"}, {"name": "Shubham Prasad", "pin": "STU0001233230"}, {"name": "Tanisha Cholera", "pin": "STU0001223397"}, {"name": "Vansh Mehta", "pin": "IMS0001156322"}, {"name": "Vishwa Saglani", "pin": "STU0001212815"}, {"name": "Yashavashvi Taori", "pin": "STU0001235438"}], "CAT 2625": [{"name": "Abhishek Tripathi", "pin": "STU0001237693"}, {"name": "Aditya Nayak", "pin": "STU0001235831"}, {"name": "Ayush Bhadoriya", "pin": "STU0001235855"}, {"name": "Devangi Joshi", "pin": "STU0001221908"}, {"name": "Dhruti Domadiya", "pin": "STU0001234675"}, {"name": "Dhruvi Panagar", "pin": "STU0001237431"}, {"name": "Diya Morvani", "pin": "STU0001214804"}, {"name": "Diya Paun", "pin": "STU0001226876"}, {"name": "GUNGUN RAJPUT", "pin": "STU0001229526"}, {"name": "Harshna Soni", "pin": "STU0001235686"}, {"name": "Jeet Dave", "pin": "STU0001237579"}, {"name": "Jinesh Shah", "pin": "STU0001235567"}, {"name": "Khushil Rami", "pin": "STU0001234576"}, {"name": "Lakshita Kothari", "pin": "STU0001233358"}, {"name": "Mahak Bothra", "pin": "STU0001237141"}, {"name": "Mahi Shah", "pin": "STU0001235739"}, {"name": "Manthan Patel", "pin": "STU0001235936"}, {"name": "Mauli Dixit", "pin": "STU0001237640"}, {"name": "Nidhi Jayswal", "pin": "STU0001235704"}, {"name": "Nilesh Chaudhary", "pin": "STU0001236133"}, {"name": "Nish Patel", "pin": "STU0001238315"}, {"name": "Rahul Ramnani", "pin": "STU0001235574"}, {"name": "Rutanshi Dave", "pin": "IMS0001085026"}, {"name": "Sachit Shettyan", "pin": "IMS0001088009"}, {"name": "Samraddh Porwal", "pin": "STU0001234838"}, {"name": "Satish Thakkar", "pin": "STU0001229826"}, {"name": "Shrey Aghera", "pin": "STU0001238277"}, {"name": "Shrimay Pandya", "pin": "STU0001235716"}, {"name": "Shruti Thaker", "pin": "STU0001237448"}, {"name": "Vansh Kotak", "pin": "STU0001232988"}, {"name": "Veer Patel", "pin": "STU0001238306"}, {"name": "Yash Solanki", "pin": "STU0001237084"}, {"name": "Yogesh Atal", "pin": "STU0001191692"}], "CAT 2626": [{"name": "Aarav Garg", "pin": "STU0001234509"}, {"name": "Abhinav Mistry", "pin": "STU0001234141"}, {"name": "Aditya Mehta", "pin": "IMS0001087819"}, {"name": "Aryan Mahajan", "pin": "STU0001235126"}, {"name": "Avani Soni", "pin": "STU0001231819"}, {"name": "Ayush kanani", "pin": "IMS0001154926"}, {"name": "Daksh Wadhwani", "pin": "STU0001239172"}, {"name": "Dhanesha Patel", "pin": "STU0001235114"}, {"name": "Eesha Gupta", "pin": "STU0001233778"}, {"name": "Gaurav singh", "pin": "STU0001228899"}, {"name": "Harsh Agarwal", "pin": "STU0001234034"}, {"name": "Harsh Modi", "pin": "STU0001186382"}, {"name": "Harsh Thaker", "pin": "STU0001239665"}, {"name": "Harshita Chinnannavar", "pin": "STU0001238891"}, {"name": "Jaydeep Chauhan", "pin": "STU0001235685"}, {"name": "Jigar Lukhi", "pin": "STU0001238468"}, {"name": "Kalp Trivedi", "pin": "IMS0001084323"}, {"name": "Krushan Jain", "pin": "IMS0000918651"}, {"name": "Kunjan Raval", "pin": "STU0001231423"}, {"name": "Mantrra Patel", "pin": "STU0001230222"}, {"name": "Maun Engineer", "pin": "STU0001218621"}, {"name": "Navya Kabra", "pin": "IMS0000914121"}, {"name": "Nency Savsani", "pin": "STU0001179935"}, {"name": "Param Modi", "pin": "STU0001238826"}, {"name": "Parth Vekariya", "pin": "STU0001236333"}, {"name": "Pragya Maurya", "pin": "STU0001238838"}, {"name": "Prakhar Agrawal", "pin": "STU0001238825"}, {"name": "Rhae Pillai", "pin": "STU0001237722"}, {"name": "Rishabh Mehta", "pin": "IMS0001130994"}, {"name": "Rutvee Bhatt", "pin": "STU0001179016"}, {"name": "Sakshi Adwani", "pin": "STU0001238922"}, {"name": "Samarth Dilip Porwal", "pin": "IMS0000984739"}, {"name": "siyanshi sharma", "pin": "STU0001200868"}, {"name": "Smit Parmar", "pin": "STU0001238758"}, {"name": "Urjah Jain", "pin": "STU0001238136"}, {"name": "Vaidik Patel", "pin": "STU0001238831"}, {"name": "Vasu Agrawal", "pin": "STU0001236002"}, {"name": "Vasu Patel", "pin": "IMS0001028268"}], "CAT 2627": [{"name": "Aalap Nair", "pin": "STU0001240612"}, {"name": "Aditya Nathwani", "pin": "STU0001239238"}, {"name": "Arushi Tibrewal", "pin": "STU0001243062"}, {"name": "Barsha Jana", "pin": "STU0001239206"}, {"name": "Bijit Das Sharma", "pin": "IMS0000989137"}, {"name": "Bornabh Gogoi", "pin": "STU0001228226"}, {"name": "Devansh Singhal", "pin": "STU0001244184"}, {"name": "Dhairya Thakkar", "pin": "IMS0000992897"}, {"name": "Dhara Bakaraniya", "pin": "STU0001237572"}, {"name": "Dhruvin Patel", "pin": "STU0001238202"}, {"name": "Disha Asnani", "pin": "STU0001183632"}, {"name": "Dwitee Kansagra", "pin": "STU0001239340"}, {"name": "Harsh Shah", "pin": "STU0001235583"}, {"name": "HarshdeepSingh", "pin": "STU0001165390"}, {"name": "Heta Dave", "pin": "STU0001240451"}, {"name": "Himanshu Tambe", "pin": "STU0001239594"}, {"name": "Hitanshu Dhuvad", "pin": "STU0001223124"}, {"name": "Jayesh Bothra", "pin": "STU0001243898"}, {"name": "Jeet Ghodasara", "pin": "STU0001238890"}, {"name": "Jemin Prajapati", "pin": "STU0001241531"}, {"name": "Karan Boda", "pin": "STU0001234233"}, {"name": "Kaushik Bhuyan", "pin": "STU0001241991"}, {"name": "Kshitiz Kumar", "pin": "STU0001241937"}, {"name": "Mann Unadkat", "pin": "STU0001240714"}, {"name": "Matin Haradwala", "pin": "STU0001239578"}, {"name": "Meet Shah", "pin": "IMS0000944784"}, {"name": "Priyanshu Shah", "pin": "STU0001238118"}, {"name": "Rittika Bhattacharjee", "pin": "STU0001237223"}, {"name": "Ronak Savdharia", "pin": "STU0001239240"}, {"name": "Shreya Pillai", "pin": "STU0001238494"}, {"name": "Sneha Doshi", "pin": "STU0001243298"}, {"name": "Srijan Mishra", "pin": "STU0001234232"}, {"name": "Unnat Kacha", "pin": "STU0001235539"}, {"name": "Vartika Asnani", "pin": "STU0001239378"}, {"name": "Vartika Gangal", "pin": "STU0001241216"}, {"name": "Vishwa Maheshwari", "pin": "STU0001240104"}, {"name": "Vivek Vasani", "pin": "STU0001232500"}, {"name": "Yoganshi Patel", "pin": "STU0001238965"}], "CAT 2628": [{"name": "Aarav Zaveri", "pin": "STU0001239751"}, {"name": "Aditi Bathla", "pin": "STU0001239358"}, {"name": "Akshay Pillai", "pin": "STU0001238104"}, {"name": "Ashwin Pillai", "pin": "IMS0001112908"}, {"name": "Bhavya Solanki", "pin": "STU0001206665"}, {"name": "Bhumi Dhanani", "pin": "STU0001169741"}, {"name": "Chahna Jaiswal", "pin": "STU0001188765"}, {"name": "Deep Chaudhary", "pin": "STU0001240848"}, {"name": "Dhairya Zota", "pin": "STU0001233428"}, {"name": "Dhanya Saiga", "pin": "STU0001204723"}, {"name": "Dhruvik Patoriya", "pin": "IMS0001118599"}, {"name": "Dravya Mehta", "pin": "STU0001236021"}, {"name": "Foram Shukla", "pin": "STU0001240129"}, {"name": "George Sheldon", "pin": "STU0001234322"}, {"name": "Hemang Vekariya", "pin": "STU0001239956"}, {"name": "Jinal Chandesar", "pin": "IMS0001088722"}, {"name": "Kelvin Vadsola", "pin": "STU0001237895"}, {"name": "Ketan Tripathi", "pin": "STU0001232530"}, {"name": "Krish Panchal", "pin": "STU0001243709"}, {"name": "Nimisha Ajmera", "pin": "STU0001233056"}, {"name": "Palak Jain", "pin": "STU0001233900"}, {"name": "Parthiv Rajyaguyu", "pin": "STU0001237443"}, {"name": "Prakruti Dave", "pin": "STU0001185256"}, {"name": "Pratik Shiyal", "pin": "STU0001241188"}, {"name": "Ravi Rajput", "pin": "STU0001235285"}, {"name": "Ritika Raisinghani", "pin": "STU0001238305"}, {"name": "Rohan Rajput", "pin": "STU0001238103"}, {"name": "Shekar Sharma", "pin": "STU0001240847"}, {"name": "Shivangi Kulshrestha", "pin": "STU0001238505"}, {"name": "Siya Sahu", "pin": "STU0001238506"}, {"name": "Suhani Acharya", "pin": "STU0001241496"}, {"name": "Tanu Tanwar", "pin": "STU0001178148"}, {"name": "Tanvir Raza", "pin": "STU0001214864"}, {"name": "Tanwar Natwar Singh", "pin": "STU0001176287"}, {"name": "Tejveer Ahluwalia", "pin": "IMS0001014101"}, {"name": "vedansh kamdar", "pin": "STU0001238302"}, {"name": "Vivek Zate", "pin": "STU0001240956"}, {"name": "Yashvi Patel", "pin": "STU0001239041"}], "CAT 2629": [{"name": "Akshay Pandya", "pin": "STU0001238740"}, {"name": "Ayush Singh", "pin": "STU0001236272"}, {"name": "Dhruv Patil", "pin": "STU0001238766"}, {"name": "Dhyey Bhalani", "pin": "STU0001239791"}, {"name": "Drashti Prajapati", "pin": "STU0001238435"}, {"name": "Dwit Darji", "pin": "STU0001173727"}, {"name": "Harsh Shukla", "pin": "STU0001239820"}, {"name": "Himanshi chauhan", "pin": "STU0001240345"}, {"name": "Ish Mangukiya", "pin": "STU0001238089"}, {"name": "Isha Nehru", "pin": "STU0001239614"}, {"name": "Jaimin Vaja", "pin": "STU0001227539"}, {"name": "Jay Chhaya", "pin": "STU0001243747"}, {"name": "Jay Soni", "pin": "STU0001238238"}, {"name": "Kairav Damani", "pin": "STU0001237505"}, {"name": "kavya Soni", "pin": "STU0001239135"}, {"name": "Keya Tejwani", "pin": "STU0001243054"}, {"name": "Kunal Lalwani", "pin": "STU0001237180"}, {"name": "Kunjesh Patel", "pin": "STU0001226975"}, {"name": "Kwisha Khadaliya", "pin": "STU0001243262"}, {"name": "Mahek Patel", "pin": "STU0001238216"}, {"name": "Om Ojha", "pin": "STU0001239318"}, {"name": "Om Pathak", "pin": "STU0001239364"}, {"name": "Pratham Rijhwani", "pin": "STU0001221742"}, {"name": "Prem Makwana", "pin": "STU0001238926"}, {"name": "Priya Adhiya", "pin": "STU0001239271"}, {"name": "Saumya Sharma", "pin": "STU0001238975"}, {"name": "Shreyansh Fofandi", "pin": "STU0001170639"}, {"name": "Shubham Goswami", "pin": "STU0001238659"}, {"name": "Sumit Gupta", "pin": "STU0001233422"}, {"name": "Vidhi Jadeja", "pin": "STU0001239611"}, {"name": "Yasar Shaikh", "pin": "STU0001239949"}, {"name": "Zenish Vasava", "pin": "STU0001240383"}], "CAT 2630": [{"name": "Arya Patel", "pin": "STU0001238818"}, {"name": "Arya Thekdi", "pin": "STU0001241826"}, {"name": "Avik Shah", "pin": "IMS0000810948"}, {"name": "Ayush Nair", "pin": "STU0001240192"}, {"name": "Baibhav Sharma", "pin": "STU0001239274"}, {"name": "Dhruv Tejwani", "pin": "STU0001237035"}, {"name": "Dhruvi Mistry", "pin": "STU0001239699"}, {"name": "Gopi Bantwa", "pin": "STU0001229805"}, {"name": "Haaris Khatri", "pin": "STU0001237552"}, {"name": "Het Prajapati", "pin": "STU0001240798"}, {"name": "Himani Rathod", "pin": "STU0001237713"}, {"name": "Jacob Zacharia", "pin": "STU0001238482"}, {"name": "Jash Gamit", "pin": "STU0001243687"}, {"name": "Kavya Mistry", "pin": "STU0001240705"}, {"name": "Krish Thakkar", "pin": "STU0001241883"}, {"name": "Kunjal Chandna", "pin": "STU0001165322"}, {"name": "Madhav Mehta", "pin": "STU0001241478"}, {"name": "Madhav Yagnik", "pin": "IMS0001140097"}, {"name": "Manuush Doshi", "pin": "STU0001238582"}, {"name": "Milan lunawat", "pin": "STU0001238496"}, {"name": "Ojaswini Tawar", "pin": "STU0001239998"}, {"name": "Pradhyumm Thakkar", "pin": "STU0001235482"}, {"name": "Pratham Mohta", "pin": "STU0001243559"}, {"name": "Preet Shah", "pin": "IMS0001115454"}, {"name": "Prisha Gandhi", "pin": "IMS0001103389"}, {"name": "Priyanshu Kalivda", "pin": "STU0001240037"}, {"name": "Rishi Gunani", "pin": "STU0001239955"}, {"name": "Shashwat Pandya", "pin": "STU0001237253"}, {"name": "Shivam Mehta", "pin": "STU0001241479"}, {"name": "Shivam Singh", "pin": "STU0001240918"}, {"name": "SHREEJA LAKHOTIA", "pin": "IMS0001045739"}, {"name": "Shrey patel", "pin": "STU0001229610"}, {"name": "Tanisha Yadav", "pin": "STU0001189497"}, {"name": "Umang Sukhadia", "pin": "STU0001234230"}, {"name": "Unnati idnani", "pin": "STU0001237283"}, {"name": "Vini Merai", "pin": "STU0001236059"}, {"name": "Yashvi Shah", "pin": "STU0001208118"}], "CAT 2631": [{"name": "Arjun jakasania", "pin": "STU0001239970"}, {"name": "Arpit Parmar", "pin": "STU0001244861"}, {"name": "Aryan Rajprasad", "pin": "STU0001244367"}, {"name": "Bhavishya Bhanot", "pin": "IMS0001095212"}, {"name": "Brinda Raval", "pin": "STU0001238502"}, {"name": "CHINTAN PATEL", "pin": "STU0001239657"}, {"name": "Dhruvi Padia", "pin": "STU0001245081"}, {"name": "Dhruvil Sharma", "pin": "STU0001245486"}, {"name": "Disha Bhavsar", "pin": "STU0001242337"}, {"name": "Diya Koradia", "pin": "STU0001244634"}, {"name": "Jay Upadhyay", "pin": "STU0001243752"}, {"name": "Kajal Rajput", "pin": "IMS0001072690"}, {"name": "Komal Agarwal", "pin": "STU0001187707"}, {"name": "Krish Shah", "pin": "STU0001236158"}, {"name": "Krisha Trivedi", "pin": "STU0001246935"}, {"name": "Malav Pethani", "pin": "STU0001245168"}, {"name": "Manal Soni", "pin": "IMS0001096253"}, {"name": "Manthan Doriya", "pin": "STU0001244056"}, {"name": "Meet Bhagdev", "pin": "STU0001245744"}, {"name": "MIRAJ LUNAGARIYA", "pin": "STU0001218487"}, {"name": "Mohit Chawla", "pin": "STU0001245124"}, {"name": "Nishikant Patil", "pin": "STU0001244901"}, {"name": "Parth Patel", "pin": "STU0001243989"}, {"name": "Princy Jain", "pin": "STU0001246283"}, {"name": "Rajveer Rai", "pin": "STU0001244493"}, {"name": "Rashi choudhary", "pin": "STU0001234205"}, {"name": "Riishi Shah", "pin": "STU0001189506"}, {"name": "Sahil Jangle", "pin": "STU0001243532"}, {"name": "Sanjana Shah", "pin": "STU0001193091"}, {"name": "Shashank Sharma", "pin": "STU0001246019"}, {"name": "Shraddha Sukhadiya", "pin": "STU0001244166"}, {"name": "Shreya Patel", "pin": "STU0001199076"}, {"name": "Sonakshi Samdani", "pin": "STU0001251268"}, {"name": "Sonu Ukawat", "pin": "STU0001246302"}, {"name": "Vansh Sharma", "pin": "STU0001243754"}, {"name": "Varshita Solanki", "pin": "STU0001243038"}, {"name": "Vedika Shah", "pin": "STU0001203247"}, {"name": "vidhi jain", "pin": "IMS0000993776"}, {"name": "Viha Parekh", "pin": "STU0001244302"}, {"name": "Vinit Panchal", "pin": "STU0001244837"}, {"name": "Yash Dulani", "pin": "STU0001244016"}], "CAT 2632": [{"name": "Aagam Shah", "pin": "IMS0001132343"}, {"name": "Akkshat Shah", "pin": "STU0001248920"}, {"name": "Ashwin Soni", "pin": "IMS0001144470"}, {"name": "Ayush Nair", "pin": "STU0001248132"}, {"name": "Chahat Chandnani", "pin": "IMS0000988630"}, {"name": "Darshil Parmar", "pin": "IMS0001070440"}, {"name": "Dev Jain", "pin": "STU0001231261"}, {"name": "Dev Patel", "pin": "STU0001245174"}, {"name": "Dhwanit Patel", "pin": "STU0001251127"}, {"name": "Dipen Paryani", "pin": "STU0001250435"}, {"name": "Drushti Thakkar", "pin": "STU0001245941"}, {"name": "Jason James", "pin": "STU0001246510"}, {"name": "Kalpesh Prajapati", "pin": "STU0001240704"}, {"name": "Khushi Kalal", "pin": "STU0001204589"}, {"name": "Khushi Vachheta", "pin": "STU0001167966"}, {"name": "Man Darji", "pin": "STU0001247467"}, {"name": "Manan Thakkar", "pin": "IMS0000976682"}, {"name": "Mausam Prajapati", "pin": "STU0001246002"}, {"name": "Nehanshi Vaidya", "pin": "STU0001247496"}, {"name": "Nikhil Prajapati", "pin": "STU0001247485"}, {"name": "Nitya Jain", "pin": "STU0001248883"}, {"name": "Palash Ahuja", "pin": "IMS0001004385"}, {"name": "Pratham Shah", "pin": "STU0001246853"}, {"name": "Prem Modi", "pin": "STU0001247437"}, {"name": "Priyam Mehta", "pin": "STU0001237486"}, {"name": "Pushti Bhatti", "pin": "STU0001244489"}, {"name": "Reva Chomal", "pin": "STU0001248172"}, {"name": "Rishit Bilore", "pin": "STU0001247832"}, {"name": "Rishit Narain", "pin": "STU0001186105"}, {"name": "Riya Madhu", "pin": "STU0001248769"}, {"name": "Ronit Prajapati", "pin": "STU0001247896"}, {"name": "Shachi Goenka", "pin": "STU0001242123"}, {"name": "Shruti Dave", "pin": "IMS0001070444"}, {"name": "Shukan Shah", "pin": "STU0001251674"}, {"name": "Sujal Dangi", "pin": "IMS0001163829"}, {"name": "Tirth Purani", "pin": "STU0001248011"}, {"name": "Vansh Shah", "pin": "STU0001247840"}, {"name": "Vatsal Tripathi", "pin": "IMS0001141153"}, {"name": "Vibhuti Chandera", "pin": "STU0001248696"}, {"name": "Yakshraj Rahevar", "pin": "STU0001247780"}, {"name": "Yash Devani", "pin": "IMS0000761292"}, {"name": "Yash shah", "pin": "STU0001250606"}], "CAT 2633": [{"name": "Aakash Makwana", "pin": "STU0001200753"}, {"name": "Aanya Shah", "pin": "STU0001247225"}, {"name": "Akhil Somani", "pin": "STU0001205289"}, {"name": "Darshil Talaviya", "pin": "STU0001247535"}, {"name": "Divyam Bhuva", "pin": "STU0001183571"}, {"name": "Heer Sathvara", "pin": "STU0001242896"}, {"name": "Jaldhi Tripathi", "pin": "STU0001246932"}, {"name": "Javal Patel", "pin": "STU0001247860"}, {"name": "Jenith Panchal", "pin": "IMS0001148689"}, {"name": "Khushi Shah", "pin": "STU0001245473"}, {"name": "Krishi Dod", "pin": "STU0001243051"}, {"name": "Krunal karulkar", "pin": "STU0001234543"}, {"name": "Mahima Poddar", "pin": "STU0001248144"}, {"name": "Manav Prajapati", "pin": "STU0001212566"}, {"name": "Om Mehta", "pin": "STU0001247785"}, {"name": "Ramya Baraiya", "pin": "STU0001244720"}, {"name": "Rimzim Mantri", "pin": "STU0001251222"}, {"name": "Suhani Patel", "pin": "IMS0001165073"}, {"name": "Sujit Thummar", "pin": "STU0001247200"}, {"name": "Tejas Solanki", "pin": "STU0001247164"}, {"name": "Tulsi keshwala", "pin": "STU0001227169"}, {"name": "Vareen Patel", "pin": "STU0001247452"}, {"name": "Ved Karpatiya", "pin": "STU0001247910"}, {"name": "Vidhi Vekariya", "pin": "STU0001245810"}], "CAT 2634": [{"name": "Aditya Bajpai", "pin": "IMS0001132155"}, {"name": "Akshata Shetty", "pin": "STU0001242836"}, {"name": "Jaydev Rajpara", "pin": "IMS0001139365"}, {"name": "Keyur Chauhan", "pin": "IMS0001070133"}, {"name": "Khush Patel", "pin": "IMS0001122101"}, {"name": "Manav Thakkar", "pin": "STU0001187411"}, {"name": "Riya Singh", "pin": "IMS0001163411"}, {"name": "Rushi Patel", "pin": "IMS0001073413"}, {"name": "Tanisha Doshi", "pin": "IMS0001128508"}, {"name": "Taniya Budhwani", "pin": "STU0001172019"}], "CAT 2635": [{"name": "Rashmi Kshatriya", "pin": "IMS0001150182"}, {"name": "Yatiraj Sinh Vaghela", "pin": "IMS0001083992"}], "CAT 2636": [{"name": "Aashni Bhatt", "pin": "STU0001254221"}, {"name": "Abhinav Kumar", "pin": "STU0001256898"}, {"name": "Amoli Patel", "pin": "IMS0001098173"}, {"name": "Aryan Mishra", "pin": "STU0001252658"}, {"name": "Bhavya Diwan", "pin": "STU0001253787"}, {"name": "Darsh Tibrewal", "pin": "IMS0000982346"}, {"name": "Devang patel", "pin": "STU0001255384"}, {"name": "Dhanvi Patel", "pin": "STU0001254212"}, {"name": "Dhaval Patel", "pin": "STU0001240550"}, {"name": "dhruv pipaliya", "pin": "IMS0001124618"}, {"name": "Faizan Sherasiya", "pin": "STU0001256886"}, {"name": "Harsha Madhad", "pin": "IMS0001156653"}, {"name": "Jal Shah", "pin": "STU0001252759"}, {"name": "KaustavJyoti Gogoi", "pin": "STU0001255400"}, {"name": "Khadija Sadik", "pin": "IMS0001043059"}, {"name": "Khooshi Sonkar", "pin": "STU0001257321"}, {"name": "Krutarth Vyas", "pin": "STU0001255188"}, {"name": "Manav Mehta", "pin": "STU0001250691"}, {"name": "Mehul Gehlot", "pin": "STU0001256414"}, {"name": "Naitik Khandelwal", "pin": "STU0001251645"}, {"name": "Niket Joshi", "pin": "STU0001180847"}, {"name": "Nisarg Thakkar", "pin": "STU0001256834"}, {"name": "Oum Patidar", "pin": "STU0001254286"}, {"name": "Prince Patel", "pin": "IMS0001143518"}, {"name": "Priyanshi Soni", "pin": "STU0001176939"}, {"name": "Rahul Yadav", "pin": "STU0001252319"}, {"name": "Ritisha Gulati", "pin": "STU0001255330"}, {"name": "Sanvi Mehta", "pin": "STU0001256686"}, {"name": "Shagun Rawat", "pin": "STU0001255634"}, {"name": "Sharanya Unnithan", "pin": "STU0001253601"}, {"name": "Shashwat Jain", "pin": "STU0001256707"}, {"name": "Shreni Mutta", "pin": "IMS0001149985"}, {"name": "Shrey Jain", "pin": "STU0001253220"}, {"name": "Shreya Patel", "pin": "STU0001255370"}, {"name": "Srishti Saraf", "pin": "STU0001255920"}, {"name": "Vani Banthia", "pin": "STU0001256220"}, {"name": "Vedant Prajapati", "pin": "IMS0001065318"}], "CAT 2637": [{"name": "Aditya Sethiya", "pin": "STU0001254665"}, {"name": "Anshul Sethiya", "pin": "STU0001253683"}, {"name": "Arpita Sharma", "pin": "STU0001251340"}, {"name": "Debergha Chakraberty", "pin": "STU0001254534"}, {"name": "Devang Bheda", "pin": "STU0001251912"}, {"name": "DHANRAJ BHATIYA", "pin": "STU0001251438"}, {"name": "Dipesh Shewani", "pin": "STU0001188954"}, {"name": "Drashti Mali", "pin": "STU0001250500"}, {"name": "Garima Gupta", "pin": "STU0001251698"}, {"name": "Hetvi Prajapati", "pin": "STU0001249542"}, {"name": "Ishan Bhatt", "pin": "STU0001250832"}, {"name": "Jainil Desai", "pin": "STU0001191268"}, {"name": "Kanishka Saboo", "pin": "STU0001253535"}, {"name": "Kautik Jain", "pin": "IMS0000876326"}, {"name": "Krisha Somaiya", "pin": "STU0001253707"}, {"name": "Om Kartik Chauhan", "pin": "STU0001248791"}, {"name": "Palak Kaila", "pin": "STU0001249388"}, {"name": "Prisha Punjabi", "pin": "STU0001247934"}, {"name": "Purvank Mali", "pin": "STU0001251861"}, {"name": "Raghav Dadhich", "pin": "STU0001252115"}, {"name": "Raghu Raj Biyani", "pin": "STU0001253685"}, {"name": "Ronit Parikh", "pin": "STU0001251161"}, {"name": "Shivani Yadav", "pin": "STU0001243850"}, {"name": "Shrey Kalya", "pin": "STU0001196430"}, {"name": "Shubham Suthar", "pin": "STU0001248701"}], "CAT 2638": [{"name": "Aashman Shah", "pin": "STU0001252960"}, {"name": "Aditya Vekariya", "pin": "STU0001214885"}, {"name": "Akshat Kothari", "pin": "STU0001261214"}, {"name": "Akshita Pagariya", "pin": "IMS0000901504"}, {"name": "Anushka Raval", "pin": "STU0001261388"}, {"name": "Asgarali Vhora", "pin": "STU0001258414"}, {"name": "Avadh Pathak", "pin": "STU0001232207"}, {"name": "Darshit Shah", "pin": "STU0001258941"}, {"name": "Devansh Shah", "pin": "STU0001192379"}, {"name": "Devanshi Patel", "pin": "IMS0000955456"}, {"name": "Devarsh Bhatt", "pin": "IMS0001106262"}, {"name": "Dharita Patel", "pin": "IMS0001143918"}, {"name": "Hardik Baxi", "pin": "STU0001197406"}, {"name": "Harsh Thakkar", "pin": "STU0001257919"}, {"name": "Hashray Kumbhani", "pin": "STU0001253792"}, {"name": "Herry Patel", "pin": "STU0001254557"}, {"name": "Isha Patel", "pin": "STU0001258113"}, {"name": "Jaitrik Shah", "pin": "STU0001258332"}, {"name": "Kavya Patel", "pin": "STU0001258039"}, {"name": "Kavya Shah", "pin": "STU0001250789"}, {"name": "Laveena Chhajer", "pin": "STU0001256229"}, {"name": "Maharshi Rao", "pin": "STU0001253869"}, {"name": "Mayur Kundnani", "pin": "STU0001254781"}, {"name": "Mitva Davda", "pin": "STU0001259993"}, {"name": "Naman Gandhi", "pin": "STU0001258055"}, {"name": "Naman Shah", "pin": "STU0001255201"}, {"name": "Nisarg Bhavsar", "pin": "STU0001258419"}, {"name": "Nishith Gajipara", "pin": "STU0001259250"}, {"name": "Pathik Bhavsar", "pin": "IMS0000992609"}, {"name": "Prachi Parmar", "pin": "STU0001251541"}, {"name": "Pushti Bhatt", "pin": "STU0001256681"}, {"name": "Ruchi Patel", "pin": "STU0001179923"}, {"name": "Sarthak Soni", "pin": "IMS0000992545"}, {"name": "Shreeta Shah", "pin": "STU0001256385"}, {"name": "Sneha Rajora", "pin": "STU0001257386"}, {"name": "Vijay Sardhara", "pin": "IMS0001151245"}, {"name": "Vriti Patel", "pin": "STU0001253056"}, {"name": "Yash Dalsania", "pin": "STU0001249449"}], "CAT 2639": [{"name": "Affankhan Pathan", "pin": "IMS0001012755"}, {"name": "Ajay Koshti", "pin": "IMS0001105093"}, {"name": "Archi Jadav", "pin": "IMS0001010067"}, {"name": "Jay Patel", "pin": "IMS0001155758"}, {"name": "Paras Jalela (Provisional)", "pin": "IMS0000924576"}, {"name": "Parth Chaturvedi", "pin": "IMS0001106987"}, {"name": "Purva Deliwala", "pin": "IMS0001112055"}, {"name": "Siddharth Vala", "pin": "IMS0001051457"}, {"name": "Yashraj Solanki", "pin": "IMS0000960387"}], "CAT 2640": [{"name": "Rahul Barot", "pin": "IMS0001082951"}], "CAT 2641": [{"name": "Akshat Changela", "pin": "IMS0000986808"}, {"name": "Anshul Gustin", "pin": "STU0001184962"}, {"name": "Arnav Sharma", "pin": "STU0001204912"}, {"name": "Bhakti Arora", "pin": "STU0001260550"}, {"name": "Bhoomi Arora", "pin": "IMS0001157291"}, {"name": "Bhuvi Kejriwal", "pin": "STU0001256932"}, {"name": "Dinil Shah", "pin": "STU0001259818"}, {"name": "Dipanshi Panchal", "pin": "STU0001183406"}, {"name": "Divyam Agarwal", "pin": "STU0001257972"}, {"name": "Drishan Maheshwari", "pin": "STU0001261629"}, {"name": "Haryush Nirmal", "pin": "STU0001261312"}, {"name": "Heet Lakhani", "pin": "STU0001238201"}, {"name": "Het Prajapati", "pin": "STU0001261504"}, {"name": "Himanshu Kumar", "pin": "STU0001261337"}, {"name": "Ishita Sharma", "pin": "STU0001261652"}, {"name": "Jainil Desai", "pin": "STU0001260196"}, {"name": "Jay Sapariya", "pin": "STU0001254675"}, {"name": "Jeet Dave", "pin": "STU0001260502"}, {"name": "Kareena Soni", "pin": "STU0001261521"}, {"name": "Khushi Shah", "pin": "STU0001261762"}, {"name": "Kshitij Bhavsar", "pin": "IMS0001157433"}, {"name": "Kundan Mahibal", "pin": "STU0001260844"}, {"name": "Kushagra Singhal", "pin": "STU0001261257"}, {"name": "Manav Parikh", "pin": "STU0001259650"}, {"name": "Meet Prajapati", "pin": "STU0001260497"}, {"name": "Navya Agarwal", "pin": "STU0001197270"}, {"name": "Pankti Rupani", "pin": "STU0001251999"}, {"name": "Rahul Nathwani", "pin": "STU0001261786"}, {"name": "Riddhi Lalwani", "pin": "IMS0000992154"}, {"name": "Saumil Agrawal", "pin": "STU0001256727"}, {"name": "Shivam Gohil", "pin": "IMS0000937356"}, {"name": "Shreyansh Chhajed", "pin": "STU0001211485"}, {"name": "Siddhi Balwani", "pin": "STU0001256988"}, {"name": "Stuti Chechani", "pin": "STU0001223125"}, {"name": "Sujal Nikam", "pin": "STU0001205432"}, {"name": "Tirth Jyotishi", "pin": "STU0001261733"}, {"name": "Vansh Shah", "pin": "STU0001258931"}, {"name": "Ved Bechara", "pin": "STU0001260920"}, {"name": "Vihaan Gandhi", "pin": "STU0001258919"}, {"name": "Vishwajit Dabhi", "pin": "STU0001261364"}, {"name": "Yesha Gohil", "pin": "STU0001234210"}], "CAT 2642": [{"name": "Abhishek Yadav", "pin": "STU0001172636"}, {"name": "Analpreetsing Bhatia", "pin": "STU0001262799"}, {"name": "Arzav Jain", "pin": "IMS0001077247"}, {"name": "Avi Raval", "pin": "STU0001243060"}, {"name": "Bansari Patel", "pin": "STU0001261888"}, {"name": "Bhoomi Sangtani", "pin": "STU0001263496"}, {"name": "Christy Tomy", "pin": "STU0001263143"}, {"name": "Darshan Lakhara", "pin": "STU0001261402"}, {"name": "Deval Devda", "pin": "STU0001262145"}, {"name": "Devesh Tansukhani", "pin": "IMS0001110744"}, {"name": "Dhruv Pankhaniya", "pin": "STU0001171695"}, {"name": "Dhwani Gajjar", "pin": "STU0001262809"}, {"name": "Dhyey Patel", "pin": "IMS0001129195"}, {"name": "Divya Patel", "pin": "STU0001263775"}, {"name": "Gautam tarani", "pin": "IMS0001118342"}, {"name": "Gokul Ezhava", "pin": "STU0001262972"}, {"name": "Harsh Joshi", "pin": "STU0001263720"}, {"name": "Harsh Solanki", "pin": "STU0001262834"}, {"name": "Harshita Verma", "pin": "IMS0001106963"}, {"name": "Himani Priyamwada", "pin": "STU0001252345"}, {"name": "Jay Talati", "pin": "STU0001255137"}, {"name": "Karvi Anjaria", "pin": "STU0001262657"}, {"name": "Krish Rohira", "pin": "IMS0001070170"}, {"name": "Moxit Patel", "pin": "STU0001263198"}, {"name": "Nirdhar Samdani", "pin": "STU0001262132"}, {"name": "Nirupam Mehta", "pin": "STU0001261887"}, {"name": "Om Modh", "pin": "STU0001263406"}, {"name": "Prakhar Agarwal", "pin": "STU0001262639"}, {"name": "Rahil Shah", "pin": "STU0001264352"}, {"name": "Rahul Chaudhary", "pin": "STU0001263949"}, {"name": "Sanidhya Mishra", "pin": "IMS0001144887"}, {"name": "Sumit Kumar", "pin": "STU0001260190"}, {"name": "Surya Kothari", "pin": "STU0001239601"}, {"name": "Vedant Bhatt", "pin": "STU0001261633"}], "CAT 2643": [{"name": "Aayushi Jain", "pin": "STU0001250499"}, {"name": "Aditya Damani", "pin": "STU0001265711"}, {"name": "Aditya Jani", "pin": "STU0001264113"}, {"name": "Aditya Nair", "pin": "STU0001198255"}, {"name": "Aditya Shekhawat", "pin": "STU0001260420"}, {"name": "Adtiya Dalia", "pin": "IMS0000843652"}, {"name": "Akshat Voriya", "pin": "IMS0001151609"}, {"name": "Amritha Prasannan", "pin": "STU0001261809"}, {"name": "Bharat Suthar", "pin": "STU0001265104"}, {"name": "Chinmay Gupta", "pin": "IMS0000875564"}, {"name": "Devanshi Shah", "pin": "IMS0000910523"}, {"name": "Dhruv Rupapara", "pin": "STU0001264586"}, {"name": "Divyansh mittal", "pin": "IMS0000951994"}, {"name": "Harshit Dave", "pin": "STU0001264597"}, {"name": "Heet Shah", "pin": "IMS0001164488"}, {"name": "Kasak Gohil", "pin": "STU0001248283"}, {"name": "kavach gohel", "pin": "STU0001229457"}, {"name": "Khwaish Jain", "pin": "IMS0001015262"}, {"name": "Krishaandini Kannan", "pin": "STU0001187769"}, {"name": "Mana Shah", "pin": "IMS0001140627"}, {"name": "Mayuresh Thawani", "pin": "STU0001186409"}, {"name": "Meet Sanchhatra", "pin": "IMS0001122190"}, {"name": "Naiya Thakkar", "pin": "STU0001264590"}, {"name": "Palak Laddha", "pin": "STU0001264602"}, {"name": "Pallavi Khatik", "pin": "STU0001264953"}, {"name": "Pia Patel", "pin": "STU0001264298"}, {"name": "Princy Bhadoriya", "pin": "IMS0001113182"}, {"name": "Prishitta Sahu", "pin": "STU0001263437"}, {"name": "Priyam Agarwal", "pin": "IMS0001082492"}, {"name": "Purv Patel", "pin": "STU0001265621"}, {"name": "Raghav Agrawal", "pin": "STU0001263813"}, {"name": "Rishabh Vyas", "pin": "STU0001262965"}, {"name": "Rudra Gajjaria", "pin": "STU0001264132"}, {"name": "Shreya Tiwari", "pin": "STU0001264106"}, {"name": "Shubham Hariyani", "pin": "STU0001254656"}, {"name": "Suyash Sharma", "pin": "STU0001265648"}, {"name": "Swathin Krishna K", "pin": "STU0001266103"}, {"name": "Vaishnavi Raghuraman", "pin": "IMS0001022521"}, {"name": "Vansh Bist", "pin": "STU0001264202"}, {"name": "Yash Patel", "pin": "STU0001263975"}, {"name": "Yasharth Kothari", "pin": "IMS0001135771"}, {"name": "Yesha Patel", "pin": "STU0001264218"}], "CAT 2644": [{"name": "Aditya Asudani", "pin": "IMS0001161236"}, {"name": "Ansh Patel", "pin": "STU0001268382"}, {"name": "Anuragsingh Hanjra", "pin": "STU0001266471"}, {"name": "Aryan Janjani", "pin": "IMS0001112190"}, {"name": "Ashesh Thakkar", "pin": "STU0001218620"}, {"name": "Ayushi Chaudhari", "pin": "IMS0001134087"}, {"name": "Ayushman Prasad", "pin": "STU0001268416"}, {"name": "Bansil Talpara", "pin": "IMS0000955522"}, {"name": "Bhumi Adwani", "pin": "STU0001270168"}, {"name": "Darpan Thacker", "pin": "STU0001266962"}, {"name": "Dhairy Patel", "pin": "IMS0001069012"}, {"name": "Drishti Khatri", "pin": "STU0001268153"}, {"name": "Gopalan Balaji", "pin": "STU0001192273"}, {"name": "Harsh Motipara", "pin": "IMS0001111969"}, {"name": "Harshil Upadhyay", "pin": "IMS0001154726"}, {"name": "Heer Shah", "pin": "STU0001267956"}, {"name": "Hiya Chourasia", "pin": "STU0001210337"}, {"name": "Kajol Bhatt", "pin": "STU0001265047"}, {"name": "Keshav Prajapati", "pin": "STU0001190968"}, {"name": "Keyur Shah", "pin": "STU0001266427"}, {"name": "Kirtan Khoda", "pin": "STU0001268515"}, {"name": "Krishna Paliwal", "pin": "STU0001264486"}, {"name": "Krishna Rajawat", "pin": "STU0001267652"}, {"name": "Mahir Panjabi", "pin": "STU0001191703"}, {"name": "Manan Upadhyay", "pin": "STU0001266071"}, {"name": "Manish Suthar", "pin": "STU0001234117"}, {"name": "Meet Shah", "pin": "STU0001265590"}, {"name": "Mokshil Jain", "pin": "STU0001170608"}, {"name": "Nandani Udwani", "pin": "STU0001266384"}, {"name": "Neal Shingala", "pin": "IMS0001121807"}, {"name": "Piyush Jain", "pin": "IMS0001056582"}, {"name": "Pranjal Sevak", "pin": "STU0001265907"}, {"name": "Pratham Patel", "pin": "IMS0001115625"}, {"name": "Pratham Upadhyay", "pin": "STU0001261746"}, {"name": "Princy Shah", "pin": "STU0001266564"}, {"name": "Punit", "pin": "STU0001242823"}, {"name": "Raj Patel", "pin": "IMS0001159005"}, {"name": "Rudra Busa", "pin": "STU0001236031"}, {"name": "Shiv Banra", "pin": "STU0001266447"}, {"name": "Shreya Shah", "pin": "IMS0000964627"}, {"name": "Shubham Prajapati", "pin": "STU0001266207"}, {"name": "Sujal Jhala", "pin": "IMS0001017383"}, {"name": "Tirth Choksi", "pin": "STU0001266557"}, {"name": "Vaibhav Solanki", "pin": "IMS0001056224"}, {"name": "Vaidehi Parmar", "pin": "IMS0001145834"}, {"name": "Vaishnavi Joshi", "pin": "STU0001240271"}, {"name": "Veer Mehta", "pin": "IMS0001141846"}, {"name": "Yamini Soni", "pin": "IMS0001107711"}, {"name": "Yash Mistry", "pin": "STU0001268944"}, {"name": "Yash Suthar", "pin": "STU0001264880"}, {"name": "Yashree Bhalgama", "pin": "STU0001208906"}], "CAT 2645": [{"name": "Anshumaan Ojha", "pin": "STU0001269745"}, {"name": "Darsh Badhiya", "pin": "STU0001241514"}, {"name": "Darshan Patel", "pin": "STU0001271771"}, {"name": "DEVAM MEHTA", "pin": "STU0001264332"}, {"name": "Devarsh Rathod", "pin": "STU0001270502"}, {"name": "Dharmi Mandowara", "pin": "STU0001270161"}, {"name": "Dhruvi Asoda", "pin": "STU0001271838"}, {"name": "Hetvi Shah", "pin": "STU0001260245"}, {"name": "Himanshu Soni", "pin": "STU0001271845"}, {"name": "Iqra Khan", "pin": "STU0001270639"}, {"name": "Jahanvi Joshi", "pin": "STU0001269431"}, {"name": "Jinisha Nahta", "pin": "STU0001270188"}, {"name": "Khushi Sharma", "pin": "STU0001188150"}, {"name": "Krish Nanavati", "pin": "STU0001268793"}, {"name": "Krishna Trivedi", "pin": "IMS0001136803"}, {"name": "Krutik Soni", "pin": "STU0001271074"}, {"name": "Mrusha B", "pin": "STU0001165895"}, {"name": "Naman Mehta", "pin": "STU0001204522"}, {"name": "Navya Mishra", "pin": "STU0001205639"}, {"name": "Neal Shah", "pin": "STU0001258487"}, {"name": "Palak Nandoriya", "pin": "STU0001271220"}, {"name": "Pratiksha Sharma", "pin": "STU0001265754"}, {"name": "Prutha Patel", "pin": "STU0001269031"}, {"name": "Purv Panara", "pin": "STU0001251102"}, {"name": "Rashi Dosi", "pin": "STU0001266066"}, {"name": "Rishabh Ajmera", "pin": "STU0001270378"}, {"name": "Riya Jain", "pin": "STU0001170065"}, {"name": "Rudra Patel", "pin": "STU0001270607"}, {"name": "Sanidhya Kothari", "pin": "STU0001271026"}, {"name": "Sheetal Jain", "pin": "IMS0001116071"}, {"name": "Shivansh kunummal", "pin": "STU0001265308"}, {"name": "Shlok Prajapati", "pin": "STU0001245966"}, {"name": "Shriyansh Parihar", "pin": "STU0001271509"}, {"name": "Smit Modh", "pin": "IMS0001161584"}, {"name": "Sneha Shukla", "pin": "IMS0001160762"}, {"name": "Sujal Shah", "pin": "IMS0001134620"}, {"name": "Tanya Wadhwani", "pin": "STU0001267357"}, {"name": "Twamev Tripath", "pin": "STU0001271251"}, {"name": "Uddish Pilani", "pin": "STU0001264511"}, {"name": "Urvesh Chaudhari", "pin": "STU0001268832"}, {"name": "Utsav Upla", "pin": "STU0001269807"}, {"name": "Vidhi Soni", "pin": "STU0001269419"}, {"name": "Yaaminnee Bingi", "pin": "IMS0001026045"}], "CAT 2646": [{"name": "Abhay Singh Chouhan", "pin": "STU0001273005"}, {"name": "Aditya Shah", "pin": "STU0001266796"}, {"name": "Akshat Choudhary", "pin": "STU0001274015"}, {"name": "Akshu Brahamaniya", "pin": "STU0001272451"}, {"name": "Amit Maliwal", "pin": "IMS0001096977"}, {"name": "Anshika Sahu", "pin": "STU0001273573"}, {"name": "Bhargav Navadiya", "pin": "STU0001197903"}, {"name": "Bhavya Patel", "pin": "STU0001274274"}, {"name": "Bittu Kumar", "pin": "STU0001273137"}, {"name": "Disha Rajput", "pin": "STU0001271988"}, {"name": "Hanish Singhvi", "pin": "STU0001272024"}, {"name": "Haripriya Laddha", "pin": "STU0001266795"}, {"name": "Hetansh Rathod", "pin": "STU0001270501"}, {"name": "Hetvi Raghvani", "pin": "IMS0001152770"}, {"name": "Hiya Anandani", "pin": "STU0001273181"}, {"name": "Jimish Mrug", "pin": "STU0001275010"}, {"name": "Krish Changvadiya", "pin": "STU0001273506"}, {"name": "Krish Sharma", "pin": "STU0001244438"}, {"name": "Krisha Champanery", "pin": "STU0001273138"}, {"name": "Mohit Gadiya", "pin": "STU0001272520"}, {"name": "Niraj Purohit", "pin": "STU0001275278"}, {"name": "Nitya Purohit", "pin": "STU0001273149"}, {"name": "Pujan Kothia", "pin": "STU0001273858"}, {"name": "Rahul Choudhury", "pin": "STU0001273857"}, {"name": "Raj Solanki", "pin": "STU0001271881"}, {"name": "Ruchita Garg", "pin": "STU0001274364"}, {"name": "Rutvi Shah", "pin": "IMS0001089035"}, {"name": "Stavan Shah", "pin": "STU0001272404"}, {"name": "Tushar maradiya", "pin": "STU0001270613"}, {"name": "Uday Zala", "pin": "STU0001272322"}, {"name": "Vasu Viroja", "pin": "STU0001273128"}, {"name": "Viral Teli", "pin": "STU0001273549"}, {"name": "Vraj Soni", "pin": "STU0001273567"}, {"name": "Vrajrajsinh Sisodiya", "pin": "STU0001202939"}, {"name": "Yash Keswani", "pin": "IMS0000906605"}, {"name": "Yash Maisheri", "pin": "STU0001274635"}, {"name": "Yash Patel", "pin": "STU0001259535"}, {"name": "Yuvi Shah", "pin": "STU0001272882"}]};
+
+// ---- CONFIG: paste your deployed Apps Script Web App URL here ----
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLyvDwbeaTtoEsMXZAchHqSLiNhYJXP9QYAXBOelGBEoCFcsRVPg8HTmvc-Tvg-kw/exec";
+
+const batchSelect = document.getElementById('batchSelect');
+const nameSelect = document.getElementById('nameSelect');
+const nameHint = document.getElementById('nameHint');
+const confirmBlock = document.getElementById('confirmBlock');
+const confirmCheck = document.getElementById('confirmCheck');
+const confirmName = document.getElementById('confirmName');
+const confirmBatch = document.getElementById('confirmBatch');
+const submitBtn = document.getElementById('submitBtn');
+const errorMsg = document.getElementById('errorMsg');
+const successBlock = document.getElementById('successBlock');
+const formCard = document.getElementById('formCard');
+const pinEcho = document.getElementById('pinEcho');
+const steps = document.querySelectorAll('.step');
+
+function setStep(n){
+  steps.forEach(s=>{
+    const stepNum = parseInt(s.dataset.step,10);
+    s.classList.remove('active','done');
+    if(stepNum < n) s.classList.add('done');
+    else if(stepNum === n) s.classList.add('active');
+  });
+}
+
+batchSelect.addEventListener('change', () => {
+  const batch = batchSelect.value;
+  nameSelect.innerHTML = '';
+  confirmBlock.style.display = 'none';
+  confirmCheck.checked = false;
+  submitBtn.disabled = true;
+
+  if(!batch){
+    nameSelect.disabled = true;
+    nameSelect.innerHTML = '<option value="">Select your batch first…</option>';
+    nameHint.textContent = '';
+    setStep(1);
+    return;
+  }
+
+  const students = BATCH_DATA[batch] || [];
+  nameSelect.disabled = false;
+  nameSelect.innerHTML = '<option value="">Select your name…</option>' +
+    students.map(s => `<option value="${s.pin}">${s.name}</option>`).join('');
+  nameHint.textContent = students.length + ' students listed in ' + batch + '. Not listed, or details wrong? Message your mentor instead of guessing.';
+  setStep(2);
+});
+
+nameSelect.addEventListener('change', () => {
+  const pin = nameSelect.value;
+  if(!pin){
+    confirmBlock.style.display = 'none';
+    submitBtn.disabled = true;
+    setStep(2);
+    return;
+  }
+  const batch = batchSelect.value;
+  const student = (BATCH_DATA[batch] || []).find(s => s.pin === pin);
+  confirmName.textContent = student ? student.name : '—';
+  confirmBatch.textContent = batch;
+  confirmBlock.style.display = 'block';
+  submitBtn.disabled = !confirmCheck.checked;
+  setStep(3);
+});
+
+confirmCheck.addEventListener('change', () => {
+  submitBtn.disabled = !confirmCheck.checked || !nameSelect.value;
+});
+
+submitBtn.addEventListener('click', async () => {
+  errorMsg.classList.remove('show');
+  const batch = batchSelect.value;
+  const pin = nameSelect.value;
+  const student = (BATCH_DATA[batch] || []).find(s => s.pin === pin);
+  if(!batch || !pin || !student || !confirmCheck.checked) return;
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting…';
+
+  const payload = {
+    pin: student.pin,
+    name: student.name,
+    batch: batch,
+    simcat7: 'Yes',
+    willAttend: 'Yes',
+    timestamp: new Date().toISOString()
+  };
+
+  try{
+    if(WEB_APP_URL && !WEB_APP_URL.includes('PASTE_YOUR')){
+      await fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload)
+      });
+    }
+    formCard.querySelectorAll('.field, .confirm-block, .steps, #submitBtn').forEach(el => el.style.display='none');
+    pinEcho.textContent = student.name + ' · ' + batch;
+    successBlock.classList.add('show');
+  }catch(e){
+    errorMsg.classList.add('show');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Confirm my attendance';
+  }
+});
+</script>
+</body>
+</html>
